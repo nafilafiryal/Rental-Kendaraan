@@ -28,23 +28,39 @@ switch ($page) {
         break;
         
     case 'pelanggan':
-        // TODO: Buat PelangganController
-        echo "Halaman Pelanggan - Coming Soon";
+        require_once 'controllers/PelangganController.php';
+        $controller = new PelangganController();
+        $controller->index();
         break;
         
     case 'rental':
-        // TODO: Buat RentalController
-        echo "Halaman Rental - Coming Soon";
+        require_once 'controllers/RentalController.php';
+        $controller = new RentalController();
+        if (isset($_GET['action']) && $_GET['action'] == 'hitung_total') {
+            $controller->hitungTotal();
+        } else {
+            $controller->index();
+        }
         break;
         
     case 'pengembalian':
-        // TODO: Buat PengembalianController
-        echo "Halaman Pengembalian - Coming Soon";
+        require_once 'controllers/PengembalianController.php';
+        $controller = new PengembalianController();
+        if (isset($_GET['action']) && $_GET['action'] == 'hitung_denda') {
+            $controller->hitungDenda();
+        } else {
+            $controller->index();
+        }
         break;
         
     case 'laporan':
-        // TODO: Buat LaporanController
-        echo "Halaman Laporan - Coming Soon";
+        require_once 'controllers/LaporanController.php';
+        $controller = new LaporanController();
+        if (isset($_GET['action']) && $_GET['action'] == 'export') {
+            $controller->export();
+        } else {
+            $controller->index();
+        }
         break;
         
     default:

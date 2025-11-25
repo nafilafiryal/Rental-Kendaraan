@@ -63,7 +63,7 @@ class KendaraanModel {
             $data['status']
         ]);
     }
-    
+
     public function update($id, $data) {
         $stmt = $this->db->prepare("
             UPDATE kendaraan 
@@ -85,6 +85,8 @@ class KendaraanModel {
         return $stmt->execute([$id]);
     }
     
+
+    
     public function getTotalKendaraan() {
         $stmt = $this->db->query("SELECT COUNT(*) as total FROM kendaraan");
         return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
@@ -101,6 +103,7 @@ class KendaraanModel {
     }
     
     public function getKendaraanPopuler($limit = 5) {
+        
         $stmt = $this->db->query("
             SELECT k.merk, k.no_plat, k.tahun, 
                    COUNT(r.id_rental) as jumlah_rental
