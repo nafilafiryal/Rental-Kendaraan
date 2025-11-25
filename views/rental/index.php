@@ -33,6 +33,7 @@
                 </div>
             </div>
         </header>
+
         <div class="content-wrapper">
             <div class="page-header">
                 <h2>Daftar Transaksi</h2>
@@ -41,29 +42,16 @@
 
             <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success">
-                <?php
-                if ($_GET['success'] == 'add') echo '✓ Transaksi rental berhasil ditambahkan!';
-                elseif ($_GET['success'] == 'delete') echo '✓ Transaksi berhasil dihapus!';
-                ?>
+                <?php if ($_GET['success'] == 'add') echo '✓ Transaksi rental berhasil ditambahkan!'; ?>
+                <?php if ($_GET['success'] == 'delete') echo '✓ Transaksi berhasil dihapus!'; ?>
             </div>
-            <?php endif; ?>
-
-            <?php if (isset($_GET['error'])): ?>
-            <div class="alert alert-danger">⚠️ Gagal memproses transaksi</div>
-            <?php endif; ?>
-
-            <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger">⚠️ <?php echo htmlspecialchars($error_message); ?></div>
             <?php endif; ?>
 
             <div class="search-bar">
                 <form method="GET" style="display: flex; gap: 12px; flex: 1;">
                     <input type="hidden" name="page" value="rental">
-                    <input type="text" name="search" placeholder="Cari no plat atau nama pelanggan..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input type="text" name="search" placeholder="Cari..." value="<?php echo htmlspecialchars($search); ?>">
                     <button type="submit" class="btn btn-primary">Cari</button>
-                    <?php if ($search): ?>
-                    <a href="index.php?page=rental" class="btn" style="background: #E5E7EB;">Reset</a>
-                    <?php endif; ?>
                 </form>
             </div>
 
@@ -74,6 +62,7 @@
                             <th>ID</th>
                             <th>Kendaraan</th>
                             <th>Pelanggan</th>
+                            <th>Sopir</th>
                             <th>Tgl Sewa</th>
                             <th>Tgl Kembali</th>
                             <th>Total Harga</th>
@@ -85,50 +74,32 @@
                         <?php foreach ($rental_list as $r): ?>
                         <tr>
                             <td><strong>#<?php echo $r['id_rental']; ?></strong></td>
+                            <td><?php echo htmlspecialchars($r['merk']); ?><br><small><?php echo htmlspecialchars($r['no_plat']); ?></small></td>
+                            <td><?php echo htmlspecialchars($r['nama_pelanggan']); ?></td>
+                            
                             <td>
-                                <?php echo htmlspecialchars($r['merk']); ?><br>
-                                <small><?php echo htmlspecialchars($r['no_plat']); ?></small>
+                                <?php if (!empty($r['nama_sopir'])): ?>
+                                    <span style="color: #059669; font-weight: 500;">👨‍✈️ <?php echo htmlspecialchars($r['nama_sopir']); ?></span>
+                                <?php else: ?>
+                                    <span style="color: #6B7280;">Lepas Kunci</span>
+                                <?php endif; ?>
                             </td>
-                            <td>
-                                <?php echo htmlspecialchars($r['nama_pelanggan']); ?><br>
-                                <small><?php echo htmlspecialchars($r['no_hp']); ?></small>
-                            </td>
+
                             <td><?php echo !empty($r['tgl_sewa']) ? date('d/m/Y', strtotime($r['tgl_sewa'])) : '-'; ?></td>
                             <td><?php echo !empty($r['tgl_kembali']) ? date('d/m/Y', strtotime($r['tgl_kembali'])) : '-'; ?></td>
                             <td><strong>Rp <?php echo number_format($r['total_harga'], 0, ',', '.'); ?></strong></td>
-                            <td>
-                                <span class="badge <?php echo $r['status'] == 'berjalan' ? 'badge-warning' : 'badge-success'; ?>">
-                                    <?php echo ucfirst($r['status']); ?>
-                                </span>
-                            </td>
+                            <td><span class="badge <?php echo $r['status'] == 'berjalan' ? 'badge-warning' : 'badge-success'; ?>"><?php echo ucfirst($r['status']); ?></span></td>
                             <td>
                                 <a href="index.php?page=rental&view=<?php echo $r['id_rental']; ?>" class="btn btn-info">Detail</a>
                                 <?php if ($r['status'] == 'berjalan'): ?>
-                                <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" onclick="return confirm('Yakin hapus transaksi ini?')">Hapus</a>
+                                <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" onclick="return confirm('Hapus?')">Hapus</a>
                                 <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
-                        
-                        <?php if (empty($rental_list)): ?>
-                        <tr>
-                            <td colspan="8" style="text-align: center;">Tidak ada data transaksi rental</td>
-                        </tr>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
-
-            <?php if ($total_pages > 1): ?>
-            <div class="pagination">
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="index.php?page=rental&p=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>" 
-                       class="<?php echo $page == $i ? 'active' : ''; ?>">
-                        <?php echo $i; ?>
-                    </a>
-                <?php endfor; ?>
-            </div>
-            <?php endif; ?>
         </div>
     </main>
 
@@ -140,27 +111,43 @@
                 
                 <div class="form-group">
                     <label>Pelanggan *</label>
-                    <select name="id_pelanggan" id="id_pelanggan" required>
+                    <select name="id_pelanggan" required>
                         <option value="">Pilih Pelanggan</option>
                         <?php foreach ($pelanggan_list as $p): ?>
-                        <option value="<?php echo $p['id_pelanggan']; ?>">
-                            <?php echo htmlspecialchars($p['nama']); ?> - <?php echo htmlspecialchars($p['no_hp']); ?>
-                        </option>
+                        <option value="<?php echo $p['id_pelanggan']; ?>"><?php echo htmlspecialchars($p['nama']); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label>Kendaraan *</label>
-                    <select name="id_kendaraan" id="id_kendaraan" required onchange="updateHargaSewa()">
+                    <select name="id_kendaraan" id="id_kendaraan" required onchange="hitungTotal()">
                         <option value="">Pilih Kendaraan</option>
                         <?php foreach ($kendaraan_tersedia as $k): ?>
-                        <option value="<?php echo $k['id_kendaraan']; ?>" data-harga="<?php echo $k['harga_sewa'] ?? 0; ?>">
+                        <option value="<?php echo $k['id_kendaraan']; ?>" data-harga="<?php echo $k['harga_sewa'] ?? 300000; ?>">
                             <?php echo htmlspecialchars($k['merk']); ?> - <?php echo htmlspecialchars($k['no_plat']); ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
-                    <small id="infoHarga" style="color: #6B7280; display: none;"></small>
+                </div>
+
+                <div class="form-group" style="background: #F9FAFB; padding: 15px; border-radius: 8px; border: 1px solid #E5E7EB;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="pakai_sopir" name="pakai_sopir" value="1" onchange="toggleSopir()">
+                        <strong>Sewa dengan Sopir?</strong>
+                    </label>
+                    
+                    <div id="div_sopir" style="display: none; margin-top: 10px;">
+                        <label>Pilih Sopir</label>
+                        <select name="id_sopir" id="id_sopir" onchange="hitungTotal()">
+                            <option value="">Pilih Sopir</option>
+                            <?php foreach ($sopir_list as $s): ?>
+                            <option value="<?php echo $s['id_sopir']; ?>" data-tarif="<?php echo $s['tarif_harian']; ?>">
+                                <?php echo htmlspecialchars($s['nama']); ?> (Rp <?php echo number_format($s['tarif_harian'], 0, ',', '.'); ?>/hari)
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
                 
                 <div class="form-row">
@@ -168,7 +155,6 @@
                         <label>Tanggal Sewa *</label>
                         <input type="date" name="tgl_sewa" id="tgl_sewa" required onchange="hitungTotal()" min="<?php echo date('Y-m-d'); ?>">
                     </div>
-                    
                     <div class="form-group">
                         <label>Tanggal Kembali *</label>
                         <input type="date" name="tgl_kembali" id="tgl_kembali" required onchange="hitungTotal()" min="<?php echo date('Y-m-d'); ?>">
@@ -177,11 +163,12 @@
                 
                 <div class="form-group">
                     <label>Total Harga</label>
-                    <input type="text" id="total_harga_display" readonly style="background: #F3F4F6; font-weight: bold; font-size: 16px;" value="Rp 0">
+                    <input type="text" id="total_harga_display" readonly style="background: #F3F4F6; font-weight: bold; font-size: 18px; color: #6B4226;" value="Rp 0">
                     <input type="hidden" name="total_harga" id="total_harga" value="0">
+                    <small id="rincian_harga" style="display: block; margin-top: 5px; color: #6B7280;"></small>
                 </div>
                 
-                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <div style="display: flex; gap: 12px;">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Simpan Transaksi</button>
                     <button type="button" class="btn" style="flex: 1; background: #E5E7EB;" onclick="closeModal()">Batal</button>
                 </div>
@@ -195,44 +182,11 @@
             <h2>Detail Transaksi Rental #<?php echo $view_data['id_rental']; ?></h2>
             <div style="padding: 20px 0;">
                 <table style="width: 100%;">
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold; width: 150px;">Pelanggan:</td>
-                        <td style="padding: 8px;"><?php echo htmlspecialchars($view_data['nama_pelanggan']); ?></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">No HP:</td>
-                        <td style="padding: 8px;"><?php echo htmlspecialchars($view_data['no_hp']); ?></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Alamat:</td>
-                        <td style="padding: 8px;"><?php echo htmlspecialchars($view_data['alamat']); ?></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Kendaraan:</td>
-                        <td style="padding: 8px;"><?php echo htmlspecialchars($view_data['merk']); ?> - <?php echo htmlspecialchars($view_data['no_plat']); ?></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Tanggal Sewa:</td>
-                        <td style="padding: 8px;"><?php echo !empty($view_data['tgl_sewa']) ? date('d F Y', strtotime($view_data['tgl_sewa'])) : '-'; ?></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Tanggal Kembali:</td>
-                        <td style="padding: 8px;"><?php echo !empty($view_data['tgl_kembali']) ? date('d F Y', strtotime($view_data['tgl_kembali'])) : '-'; ?></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Total Harga:</td>
-                        <td style="padding: 8px; font-size: 18px; font-weight: bold; color: #6B4226;">
-                            Rp <?php echo number_format($view_data['total_harga'], 0, ',', '.'); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Status:</td>
-                        <td style="padding: 8px;">
-                            <span class="badge <?php echo $view_data['status'] == 'berjalan' ? 'badge-warning' : 'badge-success'; ?>">
-                                <?php echo ucfirst($view_data['status']); ?>
-                            </span>
-                        </td>
-                    </tr>
+                    <tr><td>Pelanggan:</td><td><strong><?php echo htmlspecialchars($view_data['nama_pelanggan']); ?></strong></td></tr>
+                    <tr><td>Kendaraan:</td><td><?php echo htmlspecialchars($view_data['merk']); ?> - <?php echo htmlspecialchars($view_data['no_plat']); ?></td></tr>
+                    <tr><td>Sopir:</td><td><?php echo !empty($view_data['nama_sopir']) ? htmlspecialchars($view_data['nama_sopir']) : 'Lepas Kunci'; ?></td></tr>
+                    <tr><td>Total Harga:</td><td><strong>Rp <?php echo number_format($view_data['total_harga'], 0, ',', '.'); ?></strong></td></tr>
+                    <tr><td>Status:</td><td><?php echo ucfirst($view_data['status']); ?></td></tr>
                 </table>
             </div>
             <button onclick="window.location='index.php?page=rental'" class="btn btn-primary" style="width: 100%;">Tutup</button>
@@ -240,7 +194,107 @@
     </div>
     <?php endif; ?>
 
-    <script src="assets/js/modal.js"></script>
-    <script src="assets/js/rental.js"></script>
+    <script>
+        
+        const modal = document.getElementById('formModal');
+
+        function openModal() {
+            
+            document.getElementById('rentalForm').reset();
+            
+            
+            document.getElementById('div_sopir').style.display = 'none';
+            document.getElementById('total_harga').value = 0;
+            document.getElementById('total_harga_display').value = 'Rp 0';
+            document.getElementById('rincian_harga').innerText = '';
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        
+        function toggleSopir() {
+            const checkbox = document.getElementById('pakai_sopir');
+            const divSopir = document.getElementById('div_sopir');
+            const selectSopir = document.getElementById('id_sopir');
+            
+            if (checkbox.checked) {
+                divSopir.style.display = 'block';
+                selectSopir.setAttribute('required', 'required');
+            } else {
+                divSopir.style.display = 'none';
+                selectSopir.value = "";
+                selectSopir.removeAttribute('required');
+            }
+            hitungTotal();
+        }
+
+        function hitungTotal() {
+            const selectMobil = document.getElementById('id_kendaraan');
+            const selectSopir = document.getElementById('id_sopir');
+            const tglSewa = document.getElementById('tgl_sewa').value;
+            const tglKembali = document.getElementById('tgl_kembali').value;
+            const checkboxSopir = document.getElementById('pakai_sopir');
+
+            
+            let hargaMobil = 0;
+            if (selectMobil.selectedIndex >= 0) {
+                const option = selectMobil.options[selectMobil.selectedIndex];
+                hargaMobil = parseInt(option.getAttribute('data-harga')) || 0;
+            }
+
+            
+            let hargaSopir = 0;
+            if (checkboxSopir.checked && selectSopir.selectedIndex >= 0) {
+                const option = selectSopir.options[selectSopir.selectedIndex];
+                if(option.value) {
+                    hargaSopir = parseInt(option.getAttribute('data-tarif')) || 0;
+                }
+            }
+
+            
+            let jumlahHari = 0;
+            if (tglSewa && tglKembali) {
+                const date1 = new Date(tglSewa);
+                const date2 = new Date(tglKembali);
+                
+                if (date2 >= date1) {
+                    const diffTime = Math.abs(date2 - date1);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    jumlahHari = diffDays > 0 ? diffDays : 1; 
+                }
+            }
+
+            
+            const totalPerHari = hargaMobil + hargaSopir;
+            const grandTotal = totalPerHari * jumlahHari;
+
+            
+            document.getElementById('total_harga').value = grandTotal;
+            document.getElementById('total_harga_display').value = 'Rp ' + grandTotal.toLocaleString('id-ID');
+            
+            
+            if (jumlahHari > 0 && hargaMobil > 0) {
+                let rincian = `Mobil: Rp ${hargaMobil.toLocaleString()}`;
+                if (hargaSopir > 0) {
+                    rincian += ` + Sopir: Rp ${hargaSopir.toLocaleString()}`;
+                }
+                rincian += ` (x ${jumlahHari} hari)`;
+                document.getElementById('rincian_harga').innerText = rincian;
+            } else {
+                document.getElementById('rincian_harga').innerText = '';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -59,15 +59,16 @@ class RentalModel {
         try {
             $this->db->beginTransaction();
             
-            // Insert rental
+            
             $stmt = $this->db->prepare("
-                INSERT INTO rental (id_kendaraan, id_pelanggan, tgl_sewa, tgl_kembali, total_harga, status) 
-                VALUES (?, ?, ?, ?, ?, 'berjalan')
+                INSERT INTO rental (id_kendaraan, id_pelanggan, id_sopir, tgl_sewa, tgl_kembali, total_harga, status) 
+                VALUES (?, ?, ?, ?, ?, ?, 'berjalan')
                 RETURNING id_rental
             ");
             $stmt->execute([
                 $data['id_kendaraan'],
                 $data['id_pelanggan'],
+                $data['id_sopir'], 
                 $data['tgl_sewa'],
                 $data['tgl_kembali'],
                 $data['total_harga']
@@ -76,7 +77,7 @@ class RentalModel {
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $id_rental = $result['id_rental'];
             
-            // Update status kendaraan menjadi disewa
+            
             $stmt = $this->db->prepare("UPDATE kendaraan SET status = 'disewa' WHERE id_kendaraan = ?");
             $stmt->execute([$data['id_kendaraan']]);
             

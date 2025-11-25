@@ -2,11 +2,13 @@
 require_once 'models/RentalModel.php';
 require_once 'models/KendaraanModel.php';
 require_once 'models/PelangganModel.php';
+require_once 'models/SopirModel.php'; 
 
 class RentalController {
     private $rentalModel;
     private $kendaraanModel;
     private $pelangganModel;
+    private $sopirModel;
     
     public function __construct() {
         session_start();
@@ -17,6 +19,7 @@ class RentalController {
         $this->rentalModel = new RentalModel();
         $this->kendaraanModel = new KendaraanModel();
         $this->pelangganModel = new PelangganModel();
+        $this->sopirModel = new SopirModel(); 
     }
     
     public function index() {
@@ -34,6 +37,7 @@ class RentalController {
             $data = [
                 'id_kendaraan' => $_POST['id_kendaraan'],
                 'id_pelanggan' => $_POST['id_pelanggan'],
+                'id_sopir' => (!empty($_POST['pakai_sopir']) && !empty($_POST['id_sopir'])) ? $_POST['id_sopir'] : null,
                 'tgl_sewa' => $_POST['tgl_sewa'],
                 'tgl_kembali' => $_POST['tgl_kembali'],
                 'total_harga' => $_POST['total_harga']
@@ -63,26 +67,15 @@ class RentalController {
         });
         $pelanggan_list = $this->pelangganModel->getAll('', 1000, 0);
         
+        
+        $sopir_list = $this->sopirModel->getAll();
+        
         $view_data = null;
         if (isset($_GET['view'])) {
             $view_data = $this->rentalModel->getById($_GET['view']);
         }
         
         require_once 'views/rental/index.php';
-    }
-    
-    public function hitungTotal() {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id_kendaraan = $_POST['id_kendaraan'];
-            $tgl_sewa = $_POST['tgl_sewa'];
-            $tgl_kembali = $_POST['tgl_kembali'];
-            
-            $total = $this->rentalModel->hitungTotalHarga($id_kendaraan, $tgl_sewa, $tgl_kembali);
-            
-            header('Content-Type: application/json');
-            echo json_encode(['total_harga' => $total]);
-            exit();
-        }
     }
 }
 ?>
