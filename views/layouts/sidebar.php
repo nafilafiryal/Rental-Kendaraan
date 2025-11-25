@@ -43,4 +43,24 @@
             Logout
         </a>
     </div>
-</aside>
+</aside> <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Menutup sidebar otomatis saat menu diklik (UX Improvement)
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            // Hanya jalankan di mode mobile (lebar < 768px)
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        });
+    });
+</script>

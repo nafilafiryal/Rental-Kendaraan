@@ -7,12 +7,22 @@
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/crud.css">
     <style>
+        /* Style khusus untuk tabs laporan */
         .laporan-tabs {
             display: flex;
             gap: 8px;
             margin-bottom: 24px;
             border-bottom: 2px solid #E5E7EB;
             overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 5px; /* Tambahan agar scrollbar tidak menempel */
+        }
+        .laporan-tabs::-webkit-scrollbar {
+            height: 4px; /* Scrollbar tipis */
+        }
+        .laporan-tabs::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 4px;
         }
         .laporan-tabs a {
             padding: 12px 20px;
@@ -21,7 +31,6 @@
             font-weight: 500;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
-            white-space: nowrap;
         }
         .laporan-tabs a:hover {
             color: #2C1810;
@@ -69,9 +78,31 @@
     <?php include 'views/layouts/sidebar.php'; ?>
 
     <main class="main-content">
+        <header class="header">
+            <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Laporan & Analitik 📊</h1>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span class="user-role">Administrator</span>
+                    <div class="user-avatar">
+                        <?php echo strtoupper(substr($_SESSION['nama'] ?? 'A', 0, 1)); ?>
+                    </div>
+                </div>
+            </div>
+        </header>
         <div class="content-wrapper">
             <div class="page-header">
-                <h1>Laporan</h1>
+                <h2>Filter Laporan</h2>
                 <a href="index.php?page=laporan&action=export&jenis=<?php echo $jenis_laporan; ?>&bulan=<?php echo $bulan; ?>&tahun=<?php echo $tahun; ?>&tgl_awal=<?php echo $tgl_awal; ?>&tgl_akhir=<?php echo $tgl_akhir; ?>" 
                    class="btn btn-success">
                     📥 Export CSV
@@ -103,7 +134,6 @@
                 </a>
             </div>
 
-            <!-- Filter Box -->
             <div class="filter-box">
                 <form method="GET">
                     <input type="hidden" name="page" value="laporan">
@@ -152,13 +182,16 @@
                 </form>
             </div>
 
-            <!-- Content based on jenis_laporan -->
             <?php if ($jenis_laporan == 'kendaraan_populer'): ?>
                 <h3>Laporan Kendaraan Paling Sering Disewa</h3>
                 
                 <?php 
-                $total_rental = array_sum(array_column($data_laporan, 'jumlah_rental'));
-                $total_pendapatan = array_sum(array_column($data_laporan, 'total_pendapatan'));
+                // Gunakan array_column dan sum dengan pengecekan agar aman dari NULL
+                $col_rental = array_column($data_laporan, 'jumlah_rental');
+                $col_pendapatan = array_column($data_laporan, 'total_pendapatan');
+                
+                $total_rental = !empty($col_rental) ? array_sum($col_rental) : 0;
+                $total_pendapatan = !empty($col_pendapatan) ? array_sum($col_pendapatan) : 0;
                 ?>
                 
                 <div class="stat-summary">
@@ -198,7 +231,7 @@
                                 <td><?php echo $d['tahun']; ?></td>
                                 <td><?php echo htmlspecialchars($d['nama_tipe'] ?? '-'); ?></td>
                                 <td><strong><?php echo $d['jumlah_rental']; ?>x</strong></td>
-                                <td><strong>Rp <?php echo number_format($d['total_pendapatan'], 0, ',', '.'); ?></strong></td>
+                                <td><strong>Rp <?php echo number_format($d['total_pendapatan'] ?? 0, 0, ',', '.'); ?></strong></td>
                             </tr>
                             <?php endforeach; ?>
                             
@@ -215,8 +248,11 @@
                 <h3>Laporan Pendapatan Rental</h3>
                 
                 <?php 
-                $grand_total = array_sum(array_column($data_laporan, 'total_pendapatan'));
-                $total_transaksi = array_sum(array_column($data_laporan, 'jumlah_transaksi'));
+                $col_pendapatan = array_column($data_laporan, 'total_pendapatan');
+                $col_transaksi = array_column($data_laporan, 'jumlah_transaksi');
+                
+                $grand_total = !empty($col_pendapatan) ? array_sum($col_pendapatan) : 0;
+                $total_transaksi = !empty($col_transaksi) ? array_sum($col_transaksi) : 0;
                 ?>
                 
                 <div class="stat-summary">
@@ -248,7 +284,7 @@
                             <tr>
                                 <td><strong><?php echo date('d F Y', strtotime($d['tanggal'])); ?></strong></td>
                                 <td><?php echo $d['jumlah_transaksi']; ?> transaksi</td>
-                                <td><strong>Rp <?php echo number_format($d['total_pendapatan'], 0, ',', '.'); ?></strong></td>
+                                <td><strong>Rp <?php echo number_format($d['total_pendapatan'] ?? 0, 0, ',', '.'); ?></strong></td>
                             </tr>
                             <?php endforeach; ?>
                             
@@ -325,7 +361,7 @@
                                 <td><?php echo htmlspecialchars($d['no_hp']); ?></td>
                                 <td><?php echo htmlspecialchars(substr($d['alamat'], 0, 30)); ?>...</td>
                                 <td><?php echo $d['jumlah_rental']; ?>x</td>
-                                <td><strong>Rp <?php echo number_format($d['total_pengeluaran'], 0, ',', '.'); ?></strong></td>
+                                <td><strong>Rp <?php echo number_format($d['total_pengeluaran'] ?? 0, 0, ',', '.'); ?></strong></td>
                                 <td><?php echo date('d/m/Y', strtotime($d['terakhir_sewa'])); ?></td>
                             </tr>
                             <?php endforeach; ?>
@@ -337,7 +373,8 @@
                 <h3>Laporan Pengembalian dan Denda</h3>
                 
                 <?php 
-                $total_denda = array_sum(array_column($data_laporan, 'denda'));
+                $col_denda = array_column($data_laporan, 'denda');
+                $total_denda = !empty($col_denda) ? array_sum($col_denda) : 0;
                 ?>
                 
                 <div class="stat-summary">
@@ -379,7 +416,7 @@
                                         <?php echo ucwords(str_replace('_', ' ', $d['kondisi'])); ?>
                                     </span>
                                 </td>
-                                <td><strong>Rp <?php echo number_format($d['denda'], 0, ',', '.'); ?></strong></td>
+                                <td><strong>Rp <?php echo number_format($d['denda'] ?? 0, 0, ',', '.'); ?></strong></td>
                                 <td><?php echo htmlspecialchars($d['keterangan'] ?? '-'); ?></td>
                             </tr>
                             <?php endforeach; ?>
@@ -424,7 +461,7 @@
                                 <td><?php echo htmlspecialchars($d['merk']); ?></td>
                                 <td><?php echo htmlspecialchars($d['nama_tipe'] ?? '-'); ?></td>
                                 <td><?php echo $d['jumlah_rental']; ?>x</td>
-                                <td><strong>Rp <?php echo number_format($d['total_pendapatan'], 0, ',', '.'); ?></strong></td>
+                                <td><strong>Rp <?php echo number_format($d['total_pendapatan'] ?? 0, 0, ',', '.'); ?></strong></td>
                                 <td><?php echo $d['rata_rata_hari_sewa']; ?> hari</td>
                             </tr>
                             <?php endforeach; ?>

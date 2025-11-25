@@ -11,9 +11,18 @@
 
     <main class="main-content">
         <header class="header">
-            <div class="header-left">
-                <h1>Dashboard Admin 🚗</h1>
-                <p>Selamat datang, <?php echo htmlspecialchars($_SESSION['nama'] ?? 'Admin'); ?>!</p>
+            <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Dashboard Admin 🚗</h1>
+                    <p>Selamat datang, <?php echo htmlspecialchars($_SESSION['nama'] ?? 'Admin'); ?>!</p>
+                </div>
             </div>
             <div class="header-right">
                 <div class="user-info">
@@ -24,7 +33,6 @@
                 </div>
             </div>
         </header>
-
         <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon blue">
@@ -129,7 +137,6 @@
                             </div>
                             <div class="popular-stats">
                                 <span class="rental-count"><?php echo $kendaraan['jumlah_rental']; ?>x disewa</span>
-                                <span class="rental-price">Total Rental: <?php echo $kendaraan['jumlah_rental']; ?></span>
                             </div>
                         </div>
                         <?php endforeach; ?>

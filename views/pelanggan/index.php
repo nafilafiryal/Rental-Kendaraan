@@ -11,9 +11,31 @@
     <?php include 'views/layouts/sidebar.php'; ?>
 
     <main class="main-content">
+        <header class="header">
+            <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Data Pelanggan 👥</h1>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span class="user-role">Administrator</span>
+                    <div class="user-avatar">
+                        <?php echo strtoupper(substr($_SESSION['nama'] ?? 'A', 0, 1)); ?>
+                    </div>
+                </div>
+            </div>
+        </header>
         <div class="content-wrapper">
             <div class="page-header">
-                <h1>Data Pelanggan</h1>
+                <h2>Daftar Member</h2>
                 <button class="btn btn-primary" onclick="openModal()">+ Tambah Pelanggan</button>
             </div>
 
@@ -58,9 +80,7 @@
                         <?php foreach ($pelanggan_list as $p): ?>
                         <tr>
                             <td><strong><?php echo htmlspecialchars($p['nama']); ?></strong></td>
-                            
                             <td><?php echo htmlspecialchars($p['no_ktp'] ?? '-'); ?></td>
-                            
                             <td><?php echo htmlspecialchars($p['no_hp']); ?></td>
                             <td><?php echo htmlspecialchars($p['email'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars(substr($p['alamat'], 0, 50)); ?>...</td>
