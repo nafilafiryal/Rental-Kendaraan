@@ -1,4 +1,5 @@
-# Sistem Rental Kendaraan - Aplikasi Web Basis Data Lanjut
+# TUGAS AKHIR MATA KULIAH BASIS DATA LANJUT
+# Rental Kendaraan 
 
 Aplikasi web berbasis PHP Native dengan PostgreSQL untuk sistem manajemen rental kendaraan.
 
@@ -53,4 +54,3 @@ Aplikasi web berbasis PHP Native dengan PostgreSQL untuk sistem manajemen rental
 - **Pelanggan Aktif**: Pelanggan dengan transaksi terbanyak
 - **Pengembalian**: Laporan pengembalian dan denda
 - **Materialized View**: Demo performa improvement
-- Export to CSV untuk semua jenis laporan
