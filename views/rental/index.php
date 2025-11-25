@@ -6,6 +6,89 @@
     <title>Transaksi Rental - Rental Kendaraan</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/crud.css">
+    <style>
+        /* --- Style Tambahan untuk Toggle Sopir --- */
+        .sopir-toggle-container {
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #6B4226; /* Warna utama aplikasi */
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .toggle-text {
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #div_sopir {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #E5E7EB;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
     <?php include 'views/layouts/sidebar.php'; ?>
@@ -79,7 +162,10 @@
                             
                             <td>
                                 <?php if (!empty($r['nama_sopir'])): ?>
-                                    <span style="color: #059669; font-weight: 500;">👨‍✈️ <?php echo htmlspecialchars($r['nama_sopir']); ?></span>
+                                    <span style="color: #059669; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                        <?php echo htmlspecialchars($r['nama_sopir']); ?>
+                                    </span>
                                 <?php else: ?>
                                     <span style="color: #6B7280;">Lepas Kunci</span>
                                 <?php endif; ?>
@@ -131,22 +217,30 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="background: #F9FAFB; padding: 15px; border-radius: 8px; border: 1px solid #E5E7EB;">
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="pakai_sopir" name="pakai_sopir" value="1" onchange="toggleSopir()">
-                        <strong>Sewa dengan Sopir?</strong>
+                <div class="sopir-toggle-container">
+                    <label class="toggle-label" for="pakai_sopir">
+                        <span class="toggle-text">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B4226;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            Sewa dengan Sopir?
+                        </span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="pakai_sopir" name="pakai_sopir" value="1" onchange="toggleSopir()">
+                            <span class="slider"></span>
+                        </label>
                     </label>
                     
-                    <div id="div_sopir" style="display: none; margin-top: 10px;">
-                        <label>Pilih Sopir</label>
-                        <select name="id_sopir" id="id_sopir" onchange="hitungTotal()">
-                            <option value="">Pilih Sopir</option>
-                            <?php foreach ($sopir_list as $s): ?>
-                            <option value="<?php echo $s['id_sopir']; ?>" data-tarif="<?php echo $s['tarif_harian']; ?>">
-                                <?php echo htmlspecialchars($s['nama']); ?> (Rp <?php echo number_format($s['tarif_harian'], 0, ',', '.'); ?>/hari)
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
+                    <div id="div_sopir" style="display: none;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="id_sopir">Pilih Sopir *</label>
+                            <select name="id_sopir" id="id_sopir" onchange="hitungTotal()" style="background: white;">
+                                <option value="">-- Pilih Sopir Tersedia --</option>
+                                <?php foreach ($sopir_list as $s): ?>
+                                <option value="<?php echo $s['id_sopir']; ?>" data-tarif="<?php echo $s['tarif_harian']; ?>">
+                                    <?php echo htmlspecialchars($s['nama']); ?> (Rp <?php echo number_format($s['tarif_harian'], 0, ',', '.'); ?>/hari)
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
@@ -165,7 +259,7 @@
                     <label>Total Harga</label>
                     <input type="text" id="total_harga_display" readonly style="background: #F3F4F6; font-weight: bold; font-size: 18px; color: #6B4226;" value="Rp 0">
                     <input type="hidden" name="total_harga" id="total_harga" value="0">
-                    <small id="rincian_harga" style="display: block; margin-top: 5px; color: #6B7280;"></small>
+                    <small id="rincian_harga" style="display: block; margin-top: 5px; color: #6B7280; font-style: italic;"></small>
                 </div>
                 
                 <div style="display: flex; gap: 12px;">
@@ -182,11 +276,11 @@
             <h2>Detail Transaksi Rental #<?php echo $view_data['id_rental']; ?></h2>
             <div style="padding: 20px 0;">
                 <table style="width: 100%;">
-                    <tr><td>Pelanggan:</td><td><strong><?php echo htmlspecialchars($view_data['nama_pelanggan']); ?></strong></td></tr>
-                    <tr><td>Kendaraan:</td><td><?php echo htmlspecialchars($view_data['merk']); ?> - <?php echo htmlspecialchars($view_data['no_plat']); ?></td></tr>
-                    <tr><td>Sopir:</td><td><?php echo !empty($view_data['nama_sopir']) ? htmlspecialchars($view_data['nama_sopir']) : 'Lepas Kunci'; ?></td></tr>
-                    <tr><td>Total Harga:</td><td><strong>Rp <?php echo number_format($view_data['total_harga'], 0, ',', '.'); ?></strong></td></tr>
-                    <tr><td>Status:</td><td><?php echo ucfirst($view_data['status']); ?></td></tr>
+                    <tr><td style="padding: 8px;">Pelanggan:</td><td style="padding: 8px;"><strong><?php echo htmlspecialchars($view_data['nama_pelanggan']); ?></strong></td></tr>
+                    <tr><td style="padding: 8px;">Kendaraan:</td><td style="padding: 8px;"><?php echo htmlspecialchars($view_data['merk']); ?> - <?php echo htmlspecialchars($view_data['no_plat']); ?></td></tr>
+                    <tr><td style="padding: 8px;">Sopir:</td><td style="padding: 8px;"><?php echo !empty($view_data['nama_sopir']) ? htmlspecialchars($view_data['nama_sopir']) : 'Lepas Kunci'; ?></td></tr>
+                    <tr><td style="padding: 8px;">Total Harga:</td><td style="padding: 8px; font-size: 18px; color: #6B4226;"><strong>Rp <?php echo number_format($view_data['total_harga'], 0, ',', '.'); ?></strong></td></tr>
+                    <tr><td style="padding: 8px;">Status:</td><td style="padding: 8px;"><?php echo ucfirst($view_data['status']); ?></td></tr>
                 </table>
             </div>
             <button onclick="window.location='index.php?page=rental'" class="btn btn-primary" style="width: 100%;">Tutup</button>
@@ -195,19 +289,15 @@
     <?php endif; ?>
 
     <script>
-        
         const modal = document.getElementById('formModal');
 
         function openModal() {
-            
             document.getElementById('rentalForm').reset();
-            
-            
             document.getElementById('div_sopir').style.display = 'none';
+            document.getElementById('pakai_sopir').checked = false;
             document.getElementById('total_harga').value = 0;
             document.getElementById('total_harga_display').value = 'Rp 0';
             document.getElementById('rincian_harga').innerText = '';
-            
             modal.classList.add('active');
         }
 
@@ -215,14 +305,12 @@
             modal.classList.remove('active');
         }
 
-        
         window.onclick = function(event) {
             if (event.target == modal) {
                 closeModal();
             }
         }
 
-        
         function toggleSopir() {
             const checkbox = document.getElementById('pakai_sopir');
             const divSopir = document.getElementById('div_sopir');
@@ -246,28 +334,20 @@
             const tglKembali = document.getElementById('tgl_kembali').value;
             const checkboxSopir = document.getElementById('pakai_sopir');
 
-            
             let hargaMobil = 0;
             if (selectMobil.selectedIndex >= 0) {
-                const option = selectMobil.options[selectMobil.selectedIndex];
-                hargaMobil = parseInt(option.getAttribute('data-harga')) || 0;
+                hargaMobil = parseInt(selectMobil.options[selectMobil.selectedIndex].getAttribute('data-harga')) || 0;
             }
 
-            
             let hargaSopir = 0;
             if (checkboxSopir.checked && selectSopir.selectedIndex >= 0) {
-                const option = selectSopir.options[selectSopir.selectedIndex];
-                if(option.value) {
-                    hargaSopir = parseInt(option.getAttribute('data-tarif')) || 0;
-                }
+                hargaSopir = parseInt(selectSopir.options[selectSopir.selectedIndex].getAttribute('data-tarif')) || 0;
             }
 
-            
             let jumlahHari = 0;
             if (tglSewa && tglKembali) {
                 const date1 = new Date(tglSewa);
                 const date2 = new Date(tglKembali);
-                
                 if (date2 >= date1) {
                     const diffTime = Math.abs(date2 - date1);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
@@ -275,16 +355,13 @@
                 }
             }
 
-            
             const totalPerHari = hargaMobil + hargaSopir;
             const grandTotal = totalPerHari * jumlahHari;
 
-            
             document.getElementById('total_harga').value = grandTotal;
             document.getElementById('total_harga_display').value = 'Rp ' + grandTotal.toLocaleString('id-ID');
             
-            
-            if (jumlahHari > 0 && hargaMobil > 0) {
+            if (jumlahHari > 0 && (hargaMobil > 0 || hargaSopir > 0)) {
                 let rincian = `Mobil: Rp ${hargaMobil.toLocaleString()}`;
                 if (hargaSopir > 0) {
                     rincian += ` + Sopir: Rp ${hargaSopir.toLocaleString()}`;
