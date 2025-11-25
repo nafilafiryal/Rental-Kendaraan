@@ -5,127 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Kendaraan - Rental Kendaraan</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
-    <style>
-        .content-wrapper {
-            background: #FFFFFF;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        .search-bar {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            flex: 1;
-            padding: 10px 16px;
-            border: 1px solid #D1D5DB;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-primary {
-            background-color: #6B4226;
-            color: #FFFFFF;
-        }
-        .btn-primary:hover {
-            background-color: #573419;
-        }
-        .btn-success {
-            background-color: #10B981;
-            color: #FFFFFF;
-            font-size: 12px;
-            padding: 6px 12px;
-        }
-        .btn-danger {
-            background-color: #EF4444;
-            color: #FFFFFF;
-            font-size: 12px;
-            padding: 6px 12px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background-color: #FFFFFF;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #2C1810;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #D1D5DB;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .alert-success {
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-        .pagination {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .pagination a, .pagination span {
-            padding: 8px 12px;
-            border: 1px solid #D1D5DB;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #2C1810;
-        }
-        .pagination .active {
-            background-color: #6B4226;
-            color: #FFFFFF;
-            border-color: #6B4226;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/crud.css">
 </head>
 <body>
     <?php include 'views/layouts/sidebar.php'; ?>
@@ -214,7 +94,6 @@
         </div>
     </main>
 
-    <!-- Modal Form -->
     <div id="formModal" class="modal <?php echo $edit_data ? 'active' : ''; ?>">
         <div class="modal-content">
             <h2 id="modalTitle"><?php echo $edit_data ? 'Edit Kendaraan' : 'Tambah Kendaraan'; ?></h2>
@@ -254,9 +133,15 @@
                     <label>Status *</label>
                     <select name="status" id="status" required>
                         <option value="tersedia" <?php echo (isset($edit_data) && $edit_data['status'] == 'tersedia') ? 'selected' : ''; ?>>Tersedia</option>
-                        <option value="disewa" <?php echo (isset($edit_data) && $edit_data['status'] == 'disewa') ? 'selected' : ''; ?>>Disewa</option>
-                        <option value="perbaikan" <?php echo (isset($edit_data) && $edit_data['status'] == 'perbaikan') ? 'selected' : ''; ?>>Perbaikan</option>
+                        <option value="perbaikan" <?php echo (isset($edit_data) && $edit_data['status'] == 'perbaikan') ? 'selected' : ''; ?>>Perbaikan (Maintenance)</option>
+                        
+                        <?php if (isset($edit_data) && $edit_data['status'] == 'disewa'): ?>
+                            <option value="disewa" selected>Disewa (Sedang Rental)</option>
+                        <?php endif; ?>
                     </select>
+                    <small style="color: #6B7280; font-size: 12px; display: block; margin-top: 5px;">
+                        ℹ️ Status <b>"Disewa"</b> hanya otomatis aktif melalui menu <b>Transaksi Rental</b>.
+                    </small>
                 </div>
                 
                 <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -274,6 +159,7 @@
             document.getElementById('modalTitle').textContent = 'Tambah Kendaraan';
             document.getElementById('kendaraanForm').reset();
             document.getElementById('id_kendaraan').value = '';
+            document.getElementById('status').value = 'tersedia';
             modal.classList.add('active');
         }
         
