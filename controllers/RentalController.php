@@ -2,7 +2,7 @@
 require_once 'models/RentalModel.php';
 require_once 'models/KendaraanModel.php';
 require_once 'models/PelangganModel.php';
-require_once 'models/SopirModel.php'; 
+require_once 'models/SopirModel.php';
 
 class RentalController {
     private $rentalModel;
@@ -19,10 +19,11 @@ class RentalController {
         $this->rentalModel = new RentalModel();
         $this->kendaraanModel = new KendaraanModel();
         $this->pelangganModel = new PelangganModel();
-        $this->sopirModel = new SopirModel(); 
+        $this->sopirModel = new SopirModel();
     }
     
     public function index() {
+        
         if (isset($_GET['delete'])) {
             try {
                 $this->rentalModel->delete($_GET['delete']);
@@ -32,6 +33,7 @@ class RentalController {
             }
             exit();
         }
+        
         
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
@@ -52,24 +54,35 @@ class RentalController {
             exit();
         }
         
+        
         $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
         $per_page = 10;
         $offset = ($page - 1) * $per_page;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         
+        
         $total_records = $this->rentalModel->count($search);
         $total_pages = ceil($total_records / $per_page);
         $rental_list = $this->rentalModel->getAll($search, $per_page, $offset);
         
-        $kendaraan_list = $this->kendaraanModel->getAll('', 1000, 0);
-        $kendaraan_tersedia = array_filter($kendaraan_list, function($k) {
-            return $k['status'] == 'tersedia';
-        });
+        
+        
+        
         $pelanggan_list = $this->pelangganModel->getAll('', 1000, 0);
         
         
         $sopir_list = $this->sopirModel->getAll();
         
+        
+        $semua_kendaraan = $this->kendaraanModel->getAll('', 1000, 0);
+        
+        
+        $kendaraan_tersedia = array_filter($semua_kendaraan, function($k) {
+        
+            return strtolower($k['status']) === 'tersedia';
+        });
+        
+       
         $view_data = null;
         if (isset($_GET['view'])) {
             $view_data = $this->rentalModel->getById($_GET['view']);

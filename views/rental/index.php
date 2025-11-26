@@ -6,8 +6,9 @@
     <title>Transaksi Rental - Rental Kendaraan</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/crud.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-        /* --- Style Tambahan untuk Toggle Sopir --- */
+        /* Style Tambahan untuk Toggle Sopir */
         .sopir-toggle-container {
             background: #F9FAFB;
             border: 1px solid #E5E7EB;
@@ -15,78 +16,51 @@
             padding: 15px;
             margin-bottom: 20px;
         }
-
         .toggle-switch {
             position: relative;
             display: inline-block;
             width: 44px;
             height: 24px;
         }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: #ccc;
             transition: .4s;
             border-radius: 24px;
         }
-
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
         }
-
-        input:checked + .slider {
-            background-color: #6B4226; /* Warna utama aplikasi */
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-
+        input:checked + .slider { background-color: #6B4226; }
+        input:checked + .slider:before { transform: translateX(20px); }
         .toggle-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
         }
-
         .toggle-text {
-            font-weight: 500;
-            color: #374151;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 500; color: #374151; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
         }
-
         #div_sopir {
-            margin-top: 15px;
-            padding-top: 15px;
+            margin-top: 15px; padding-top: 15px;
             border-top: 1px solid #E5E7EB;
             animation: slideDown 0.3s ease-out;
         }
-
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        /* Fix style input flatpickr agar sama dengan input lain */
+        .flatpickr-input {
+            background-color: #fff !important;
         }
     </style>
 </head>
@@ -171,8 +145,8 @@
                                 <?php endif; ?>
                             </td>
 
-                            <td><?php echo !empty($r['tgl_sewa']) ? date('d/m/Y', strtotime($r['tgl_sewa'])) : '-'; ?></td>
-                            <td><?php echo !empty($r['tgl_kembali']) ? date('d/m/Y', strtotime($r['tgl_kembali'])) : '-'; ?></td>
+                            <td><?php echo !empty($r['tgl_sewa']) ? date('d F Y', strtotime($r['tgl_sewa'])) : '-'; ?></td>
+                            <td><?php echo !empty($r['tgl_kembali']) ? date('d F Y', strtotime($r['tgl_kembali'])) : '-'; ?></td>
                             <td><strong>Rp <?php echo number_format($r['total_harga'], 0, ',', '.'); ?></strong></td>
                             <td><span class="badge <?php echo $r['status'] == 'berjalan' ? 'badge-warning' : 'badge-success'; ?>"><?php echo ucfirst($r['status']); ?></span></td>
                             <td>
@@ -247,11 +221,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tanggal Sewa *</label>
-                        <input type="date" name="tgl_sewa" id="tgl_sewa" required onchange="hitungTotal()" min="<?php echo date('Y-m-d'); ?>">
+                        <input type="text" class="datepicker" name="tgl_sewa" id="tgl_sewa" required placeholder="Pilih tanggal...">
                     </div>
                     <div class="form-group">
                         <label>Tanggal Kembali *</label>
-                        <input type="date" name="tgl_kembali" id="tgl_kembali" required onchange="hitungTotal()" min="<?php echo date('Y-m-d'); ?>">
+                        <input type="text" class="datepicker" name="tgl_kembali" id="tgl_kembali" required placeholder="Pilih tanggal...">
                     </div>
                 </div>
                 
@@ -279,6 +253,10 @@
                     <tr><td style="padding: 8px;">Pelanggan:</td><td style="padding: 8px;"><strong><?php echo htmlspecialchars($view_data['nama_pelanggan']); ?></strong></td></tr>
                     <tr><td style="padding: 8px;">Kendaraan:</td><td style="padding: 8px;"><?php echo htmlspecialchars($view_data['merk']); ?> - <?php echo htmlspecialchars($view_data['no_plat']); ?></td></tr>
                     <tr><td style="padding: 8px;">Sopir:</td><td style="padding: 8px;"><?php echo !empty($view_data['nama_sopir']) ? htmlspecialchars($view_data['nama_sopir']) : 'Lepas Kunci'; ?></td></tr>
+                    
+                    <tr><td style="padding: 8px;">Tanggal Sewa:</td><td style="padding: 8px;"><?php echo !empty($view_data['tgl_sewa']) ? date('d F Y', strtotime($view_data['tgl_sewa'])) : '-'; ?></td></tr>
+                    <tr><td style="padding: 8px;">Tanggal Kembali:</td><td style="padding: 8px;"><?php echo !empty($view_data['tgl_kembali']) ? date('d F Y', strtotime($view_data['tgl_kembali'])) : '-'; ?></td></tr>
+                    
                     <tr><td style="padding: 8px;">Total Harga:</td><td style="padding: 8px; font-size: 18px; color: #6B4226;"><strong>Rp <?php echo number_format($view_data['total_harga'], 0, ',', '.'); ?></strong></td></tr>
                     <tr><td style="padding: 8px;">Status:</td><td style="padding: 8px;"><?php echo ucfirst($view_data['status']); ?></td></tr>
                 </table>
@@ -288,7 +266,24 @@
     </div>
     <?php endif; ?>
 
+    <script src="assets/js/modal.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
     <script>
+        // Inisialisasi Flatpickr (Kalender Indonesia)
+        flatpickr(".datepicker", {
+            altInput: true,
+            altFormat: "j F Y", // Tampilan User: 27 November 2025
+            dateFormat: "Y-m-d", // Kirim ke Server: 2025-11-27
+            locale: "id",
+            minDate: "today",
+            onChange: function(selectedDates, dateStr, instance) {
+                hitungTotal(); // Panggil hitung total saat tanggal berubah
+            }
+        });
+
         const modal = document.getElementById('formModal');
 
         function openModal() {
@@ -341,7 +336,10 @@
 
             let hargaSopir = 0;
             if (checkboxSopir.checked && selectSopir.selectedIndex >= 0) {
-                hargaSopir = parseInt(selectSopir.options[selectSopir.selectedIndex].getAttribute('data-tarif')) || 0;
+                const option = selectSopir.options[selectSopir.selectedIndex];
+                if(option.value) {
+                    hargaSopir = parseInt(option.getAttribute('data-tarif')) || 0;
+                }
             }
 
             let jumlahHari = 0;
