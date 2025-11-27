@@ -115,5 +115,10 @@ class KendaraanModel {
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getKendaraanPerbaikan() {
+        $stmt = $this->db->query("SELECT COUNT(*) as total FROM kendaraan WHERE status = 'perbaikan'");
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    }
 }
 ?>

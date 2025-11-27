@@ -34,6 +34,11 @@ class RentalController {
             exit();
         }
         
+        if (isset($_GET['activate'])) {
+            $this->rentalModel->activateBooking($_GET['activate']);
+            header("Location: index.php?page=rental&success=activate");
+            exit();
+        }
         
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [

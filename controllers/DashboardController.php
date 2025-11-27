@@ -25,7 +25,8 @@ class DashboardController {
         $data = [
             'total_kendaraan' => $this->kendaraanModel->getTotalKendaraan(),
             'kendaraan_tersedia' => $this->kendaraanModel->getKendaraanTersedia(),
-            'kendaraan_disewa' => $this->kendaraanModel->getKendaraanDisewa(),
+            // 'kendaraan_disewa' => $this->kendaraanModel->getKendaraanDisewa(),
+            'kendaraan_perbaikan' => $this->kendaraanModel->getKendaraanPerbaikan(),
             'total_pelanggan' => $this->pelangganModel->getTotalPelanggan(),
             'rental_berjalan' => $this->rentalModel->getRentalBerjalan(),
             'pendapatan_bulan_ini' => $this->rentalModel->getPendapatanBulanIni(),

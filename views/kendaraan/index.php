@@ -33,9 +33,11 @@
                 </div>
             </div>
         </header>
+
         <div class="content-wrapper">
             <div class="page-header">
-                <h2>Daftar Unit</h2> <button class="btn btn-primary" onclick="openModal()">+ Tambah Kendaraan</button>
+                <h2>Daftar Unit</h2>
+                <button class="btn btn-primary" onclick="openModal()">+ Tambah Kendaraan</button>
             </div>
 
             <?php if (isset($_GET['success'])): ?>
@@ -66,8 +68,7 @@
                             <th>No Plat</th>
                             <th>Merk</th>
                             <th>Tahun</th>
-                            <th>Tipe</th>
-                            <th>Status</th>
+                            <th>Harga Sewa</th> <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -77,7 +78,9 @@
                             <td><strong><?php echo htmlspecialchars($k['no_plat']); ?></strong></td>
                             <td><?php echo htmlspecialchars($k['merk']); ?></td>
                             <td><?php echo htmlspecialchars($k['tahun']); ?></td>
-                            <td><?php echo htmlspecialchars($k['nama_tipe'] ?? '-'); ?></td>
+                            
+                            <td>Rp <?php echo number_format($k['harga_sewa'] ?? 300000, 0, ',', '.'); ?></td>
+                            
                             <td>
                                 <span class="badge <?php 
                                     echo $k['status'] == 'tersedia' ? 'badge-success' : 
@@ -132,9 +135,16 @@
                     <input type="text" name="merk" id="merk" required value="<?php echo htmlspecialchars($edit_data['merk'] ?? ''); ?>">
                 </div>
                 
-                <div class="form-group">
-                    <label>Tahun *</label>
-                    <input type="number" name="tahun" id="tahun" required value="<?php echo htmlspecialchars($edit_data['tahun'] ?? date('Y')); ?>">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Tahun *</label>
+                        <input type="number" name="tahun" id="tahun" required value="<?php echo htmlspecialchars($edit_data['tahun'] ?? date('Y')); ?>">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Harga Sewa (Rp) *</label>
+                        <input type="number" name="harga_sewa" id="harga_sewa" required placeholder="Contoh: 300000" value="<?php echo htmlspecialchars($edit_data['harga_sewa'] ?? '300000'); ?>">
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -151,18 +161,31 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Status *</label>
-                    <select name="status" id="status" required>
+                    <label>Status</label>
+                    
+                    <?php 
+                    $is_rented = (isset($edit_data) && $edit_data['status'] == 'disewa'); 
+                    ?>
+
+                    <select name="status" id="status" required <?php echo $is_rented ? 'disabled style="background-color: #e5e7eb; cursor: not-allowed;"' : ''; ?>>
                         <option value="tersedia" <?php echo (isset($edit_data) && $edit_data['status'] == 'tersedia') ? 'selected' : ''; ?>>Tersedia</option>
                         <option value="perbaikan" <?php echo (isset($edit_data) && $edit_data['status'] == 'perbaikan') ? 'selected' : ''; ?>>Perbaikan (Maintenance)</option>
                         
-                        <?php if (isset($edit_data) && $edit_data['status'] == 'disewa'): ?>
+                        <?php if ($is_rented): ?>
                             <option value="disewa" selected>Disewa (Sedang Rental)</option>
                         <?php endif; ?>
                     </select>
-                    <small style="color: #6B7280; font-size: 12px; display: block; margin-top: 5px;">
-                        ℹ️ Status <b>"Disewa"</b> hanya otomatis aktif melalui menu <b>Transaksi Rental</b>.
-                    </small>
+
+                    <?php if ($is_rented): ?>
+                        <input type="hidden" name="status" value="disewa">
+                        <small style="color: #EF4444; font-size: 12px; display: block; margin-top: 5px; font-weight: bold;">
+                            🔒 Status terkunci karena mobil sedang dalam transaksi sewa.
+                        </small>
+                    <?php else: ?>
+                        <small style="color: #6B7280; font-size: 12px; display: block; margin-top: 5px;">
+                            ℹ️ Ubah status ke "Perbaikan" jika mobil sedang maintenance.
+                        </small>
+                    <?php endif; ?>
                 </div>
                 
                 <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -180,7 +203,14 @@
             document.getElementById('modalTitle').textContent = 'Tambah Kendaraan';
             document.getElementById('kendaraanForm').reset();
             document.getElementById('id_kendaraan').value = '';
-            document.getElementById('status').value = 'tersedia';
+            document.getElementById('harga_sewa').value = '300000'; 
+            
+            const statusSelect = document.getElementById('status');
+            statusSelect.value = 'tersedia';
+            statusSelect.disabled = false;
+            statusSelect.style.backgroundColor = '#fff';
+            statusSelect.style.cursor = 'default';
+            
             modal.classList.add('active');
         }
         

@@ -8,60 +8,22 @@
     <link rel="stylesheet" href="assets/css/crud.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-        /* Style Tambahan untuk Toggle Sopir */
-        .sopir-toggle-container {
-            background: #F9FAFB;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
+        /* Badge Booking warna biru */
+        .badge-primary { background-color: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; }
+        
+        /* Style Toggle */
+        .sopir-toggle-container { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #6B4226; }
         input:checked + .slider:before { transform: translateX(20px); }
-        .toggle-label {
-            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-        }
-        .toggle-text {
-            font-weight: 500; color: #374151; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-        #div_sopir {
-            margin-top: 15px; padding-top: 15px;
-            border-top: 1px solid #E5E7EB;
-            animation: slideDown 0.3s ease-out;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Fix style input flatpickr agar sama dengan input lain */
-        .flatpickr-input {
-            background-color: #fff !important;
-        }
+        .toggle-label { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .toggle-text { font-weight: 500; color: #374151; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        #div_sopir { margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .flatpickr-input { background-color: #fff !important; }
     </style>
 </head>
 <body>
@@ -71,22 +33,14 @@
         <header class="header">
             <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
                 <button class="menu-toggle" onclick="toggleSidebar()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
-                <div>
-                    <h1>Transaksi Rental 📄</h1>
-                </div>
+                <div><h1>Transaksi Rental 📄</h1></div>
             </div>
             <div class="header-right">
                 <div class="user-info">
                     <span class="user-role">Administrator</span>
-                    <div class="user-avatar">
-                        <?php echo strtoupper(substr($_SESSION['nama'] ?? 'A', 0, 1)); ?>
-                    </div>
+                    <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['nama'] ?? 'A', 0, 1)); ?></div>
                 </div>
             </div>
         </header>
@@ -99,8 +53,11 @@
 
             <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success">
-                <?php if ($_GET['success'] == 'add') echo '✓ Transaksi rental berhasil ditambahkan!'; ?>
-                <?php if ($_GET['success'] == 'delete') echo '✓ Transaksi berhasil dihapus!'; ?>
+                <?php 
+                if ($_GET['success'] == 'add') echo '✓ Transaksi rental berhasil ditambahkan!'; 
+                elseif ($_GET['success'] == 'delete') echo '✓ Transaksi berhasil dihapus!'; 
+                elseif ($_GET['success'] == 'activate') echo '✓ Booking berhasil diaktifkan (Berjalan)!'; 
+                ?>
             </div>
             <?php endif; ?>
 
@@ -133,27 +90,36 @@
                             <td><strong>#<?php echo $r['id_rental']; ?></strong></td>
                             <td><?php echo htmlspecialchars($r['merk']); ?><br><small><?php echo htmlspecialchars($r['no_plat']); ?></small></td>
                             <td><?php echo htmlspecialchars($r['nama_pelanggan']); ?></td>
-                            
                             <td>
                                 <?php if (!empty($r['nama_sopir'])): ?>
-                                    <span style="color: #059669; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                        <?php echo htmlspecialchars($r['nama_sopir']); ?>
-                                    </span>
+                                    <span style="color: #059669; font-weight: 500;">👨‍✈️ <?php echo htmlspecialchars($r['nama_sopir']); ?></span>
                                 <?php else: ?>
                                     <span style="color: #6B7280;">Lepas Kunci</span>
                                 <?php endif; ?>
                             </td>
-
                             <td><?php echo !empty($r['tgl_sewa']) ? date('d F Y', strtotime($r['tgl_sewa'])) : '-'; ?></td>
                             <td><?php echo !empty($r['tgl_kembali']) ? date('d F Y', strtotime($r['tgl_kembali'])) : '-'; ?></td>
                             <td><strong>Rp <?php echo number_format($r['total_harga'], 0, ',', '.'); ?></strong></td>
-                            <td><span class="badge <?php echo $r['status'] == 'berjalan' ? 'badge-warning' : 'badge-success'; ?>"><?php echo ucfirst($r['status']); ?></span></td>
                             <td>
-                                <a href="index.php?page=rental&view=<?php echo $r['id_rental']; ?>" class="btn btn-info">Detail</a>
-                                <?php if ($r['status'] == 'berjalan'): ?>
-                                <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" onclick="return confirm('Hapus?')">Hapus</a>
-                                <?php endif; ?>
+                                <span class="badge <?php 
+                                    echo $r['status'] == 'booking' ? 'badge-primary' : 
+                                        ($r['status'] == 'berjalan' ? 'badge-warning' : 'badge-success'); 
+                                ?>">
+                                    <?php echo ucfirst($r['status']); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 5px;">
+                                    <a href="index.php?page=rental&view=<?php echo $r['id_rental']; ?>" class="btn btn-info" style="padding: 6px 10px;">👁️</a>
+                                    
+                                    <?php if ($r['status'] == 'booking'): ?>
+                                        <a href="index.php?page=rental&activate=<?php echo $r['id_rental']; ?>" class="btn btn-success" style="padding: 6px 10px;" onclick="return confirm('Pelanggan sudah mengambil unit? Aktifkan rental ini sekarang?')" title="Ambil Unit">🚗 Ambil</a>
+                                        <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" style="padding: 6px 10px;" onclick="return confirm('Batalkan booking ini?')">❌</a>
+                                    
+                                    <?php elseif ($r['status'] == 'berjalan'): ?>
+                                        <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" style="padding: 6px 10px;" onclick="return confirm('Hapus transaksi berjalan?')">❌</a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -253,10 +219,8 @@
                     <tr><td style="padding: 8px;">Pelanggan:</td><td style="padding: 8px;"><strong><?php echo htmlspecialchars($view_data['nama_pelanggan']); ?></strong></td></tr>
                     <tr><td style="padding: 8px;">Kendaraan:</td><td style="padding: 8px;"><?php echo htmlspecialchars($view_data['merk']); ?> - <?php echo htmlspecialchars($view_data['no_plat']); ?></td></tr>
                     <tr><td style="padding: 8px;">Sopir:</td><td style="padding: 8px;"><?php echo !empty($view_data['nama_sopir']) ? htmlspecialchars($view_data['nama_sopir']) : 'Lepas Kunci'; ?></td></tr>
-                    
                     <tr><td style="padding: 8px;">Tanggal Sewa:</td><td style="padding: 8px;"><?php echo !empty($view_data['tgl_sewa']) ? date('d F Y', strtotime($view_data['tgl_sewa'])) : '-'; ?></td></tr>
                     <tr><td style="padding: 8px;">Tanggal Kembali:</td><td style="padding: 8px;"><?php echo !empty($view_data['tgl_kembali']) ? date('d F Y', strtotime($view_data['tgl_kembali'])) : '-'; ?></td></tr>
-                    
                     <tr><td style="padding: 8px;">Total Harga:</td><td style="padding: 8px; font-size: 18px; color: #6B4226;"><strong>Rp <?php echo number_format($view_data['total_harga'], 0, ',', '.'); ?></strong></td></tr>
                     <tr><td style="padding: 8px;">Status:</td><td style="padding: 8px;"><?php echo ucfirst($view_data['status']); ?></td></tr>
                 </table>
@@ -267,25 +231,16 @@
     <?php endif; ?>
 
     <script src="assets/js/modal.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
     <script>
-        // Inisialisasi Flatpickr (Kalender Indonesia)
         flatpickr(".datepicker", {
-            altInput: true,
-            altFormat: "j F Y", // Tampilan User: 27 November 2025
-            dateFormat: "Y-m-d", // Kirim ke Server: 2025-11-27
-            locale: "id",
-            minDate: "today",
-            onChange: function(selectedDates, dateStr, instance) {
-                hitungTotal(); // Panggil hitung total saat tanggal berubah
-            }
+            altInput: true, altFormat: "j F Y", dateFormat: "Y-m-d", locale: "id", minDate: "today",
+            onChange: function() { hitungTotal(); }
         });
 
         const modal = document.getElementById('formModal');
-
         function openModal() {
             document.getElementById('rentalForm').reset();
             document.getElementById('div_sopir').style.display = 'none';
@@ -295,29 +250,17 @@
             document.getElementById('rincian_harga').innerText = '';
             modal.classList.add('active');
         }
-
-        function closeModal() {
-            modal.classList.remove('active');
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
+        function closeModal() { modal.classList.remove('active'); }
+        window.onclick = function(event) { if (event.target == modal) closeModal(); }
 
         function toggleSopir() {
             const checkbox = document.getElementById('pakai_sopir');
             const divSopir = document.getElementById('div_sopir');
             const selectSopir = document.getElementById('id_sopir');
-            
             if (checkbox.checked) {
-                divSopir.style.display = 'block';
-                selectSopir.setAttribute('required', 'required');
+                divSopir.style.display = 'block'; selectSopir.setAttribute('required', 'required');
             } else {
-                divSopir.style.display = 'none';
-                selectSopir.value = "";
-                selectSopir.removeAttribute('required');
+                divSopir.style.display = 'none'; selectSopir.value = ""; selectSopir.removeAttribute('required');
             }
             hitungTotal();
         }
@@ -330,22 +273,17 @@
             const checkboxSopir = document.getElementById('pakai_sopir');
 
             let hargaMobil = 0;
-            if (selectMobil.selectedIndex >= 0) {
-                hargaMobil = parseInt(selectMobil.options[selectMobil.selectedIndex].getAttribute('data-harga')) || 0;
-            }
+            if (selectMobil.selectedIndex >= 0) hargaMobil = parseInt(selectMobil.options[selectMobil.selectedIndex].getAttribute('data-harga')) || 0;
 
             let hargaSopir = 0;
             if (checkboxSopir.checked && selectSopir.selectedIndex >= 0) {
                 const option = selectSopir.options[selectSopir.selectedIndex];
-                if(option.value) {
-                    hargaSopir = parseInt(option.getAttribute('data-tarif')) || 0;
-                }
+                if(option.value) hargaSopir = parseInt(option.getAttribute('data-tarif')) || 0;
             }
 
             let jumlahHari = 0;
             if (tglSewa && tglKembali) {
-                const date1 = new Date(tglSewa);
-                const date2 = new Date(tglKembali);
+                const date1 = new Date(tglSewa); const date2 = new Date(tglKembali);
                 if (date2 >= date1) {
                     const diffTime = Math.abs(date2 - date1);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
@@ -361,9 +299,7 @@
             
             if (jumlahHari > 0 && (hargaMobil > 0 || hargaSopir > 0)) {
                 let rincian = `Mobil: Rp ${hargaMobil.toLocaleString()}`;
-                if (hargaSopir > 0) {
-                    rincian += ` + Sopir: Rp ${hargaSopir.toLocaleString()}`;
-                }
+                if (hargaSopir > 0) rincian += ` + Sopir: Rp ${hargaSopir.toLocaleString()}`;
                 rincian += ` (x ${jumlahHari} hari)`;
                 document.getElementById('rincian_harga').innerText = rincian;
             } else {
