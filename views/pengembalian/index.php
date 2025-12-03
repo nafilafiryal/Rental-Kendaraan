@@ -21,7 +21,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Pengembalian</h1>
+                    <h1>Pengembalian 🔄</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -33,17 +33,18 @@
                 </div>
             </div>
         </header>
+
         <div class="content-wrapper">
             <div class="page-header">
                 <h2>Proses Pengembalian</h2>
             </div>
 
             <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success">Pengembalian berhasil diproses!</div>
+            <div class="alert alert-success">✓ Pengembalian berhasil diproses!</div>
             <?php endif; ?>
 
             <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger"> <?php echo htmlspecialchars($error_message); ?></div>
+            <div class="alert alert-danger">⚠️ <?php echo htmlspecialchars($error_message); ?></div>
             <?php endif; ?>
 
             <h3 style="margin: 24px 0 16px 0; color: #2C1810;">Rental Aktif</h3>
@@ -67,7 +68,7 @@
                             <th>Kendaraan</th>
                             <th>Pelanggan</th>
                             <th>Tgl Sewa</th>
-                            <th>Tgl Kembali</th>
+                            <th>Tgl Kembali (Rencana)</th>
                             <th>Total Harga</th>
                             <th>Aksi</th>
                         </tr>
@@ -110,7 +111,9 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Tgl Pengembalian</th>
+                            <th>Tgl Sewa</th>
+                            <th>Tenggat (Rencana)</th>
+                            <th>Tgl Kembali (Realisasi)</th>
                             <th>Kendaraan</th>
                             <th>Pelanggan</th>
                             <th>Kondisi</th>
@@ -122,7 +125,19 @@
                         <?php if (!empty($riwayat_pengembalian)): ?>
                             <?php foreach ($riwayat_pengembalian as $p): ?>
                             <tr>
-                                <td><?php echo !empty($p['tgl_pengembalian']) ? date('d/m/Y', strtotime($p['tgl_pengembalian'])) : '-'; ?></td>
+                                <td><?php echo !empty($p['tgl_sewa']) ? date('d/m/y', strtotime($p['tgl_sewa'])) : '-'; ?></td>
+                                
+                                <td><?php echo !empty($p['tgl_rencana']) ? date('d/m/y', strtotime($p['tgl_rencana'])) : '-'; ?></td>
+                                
+                                <td>
+                                    <?php 
+                                        $tgl_real = !empty($p['tgl_pengembalian']) ? date('d/m/y', strtotime($p['tgl_pengembalian'])) : '-';
+                                        // Highlight merah jika telat (Tgl Kembali > Tenggat) & Denda > 0
+                                        $is_late = ($p['denda'] > 0);
+                                        echo $is_late ? "<span style='color:red; font-weight:bold;'>$tgl_real</span>" : $tgl_real;
+                                    ?>
+                                </td>
+
                                 <td>
                                     <?php echo htmlspecialchars($p['merk']); ?><br>
                                     <small><?php echo htmlspecialchars($p['no_plat']); ?></small>
@@ -136,13 +151,21 @@
                                         <?php echo ucwords(str_replace('_', ' ', $p['kondisi'])); ?>
                                     </span>
                                 </td>
-                                <td><strong>Rp <?php echo number_format($p['denda'], 0, ',', '.'); ?></strong></td>
+                                
+                                <td>
+                                    <?php if ($p['denda'] > 0): ?>
+                                        <strong style="color: #DC2626;">Rp <?php echo number_format($p['denda'], 0, ',', '.'); ?></strong>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
+                                
                                 <td><?php echo htmlspecialchars($p['keterangan'] ?? '-'); ?></td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" style="text-align: center;">Belum ada riwayat pengembalian</td>
+                                <td colspan="8" style="text-align: center;">Belum ada riwayat pengembalian</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
