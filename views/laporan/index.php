@@ -91,29 +91,45 @@
                     <input type="hidden" name="jenis" value="<?php echo $jenis_laporan; ?>">
                     
                     <div class="filter-row">
-    <?php if (in_array($jenis_laporan, ['kendaraan_populer', 'pengembalian', 'utilisasi', 'pelanggan'])): ?>
-        <div class="form-group">
-            <label>Bulan</label>
-            <select name="bulan">
-                <option value="">Semua Bulan</option>
-                <?php for ($i = 1; $i <= 12; $i++): ?>
-                <option value="<?php echo $i; ?>" <?php echo $bulan == $i ? 'selected' : ''; ?>>
-                    <?php echo date('F', mktime(0, 0, 0, $i, 1)); ?>
-                </option>
-                <?php endfor; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Tahun</label>
-            <select name="tahun">
-                <?php for ($i = date('Y'); $i >= date('Y') - 5; $i--): ?>
-                <option value="<?php echo $i; ?>" <?php echo $tahun == $i ? 'selected' : ''; ?>>
-                    <?php echo $i; ?>
-                </option>
-                <?php endfor; ?>
-            </select>
-        </div>
-    <?php endif; ?>
+                        <?php if (in_array($jenis_laporan, ['kendaraan_populer', 'pengembalian', 'utilisasi', 'pelanggan'])): ?>
+                            <div class="form-group">
+                                <label>Bulan</label>
+                                <select name="bulan">
+                                    <option value="">Semua Bulan</option>
+                                    <?php for ($i = 1; $i <= 12; $i++): ?>
+                                    <option value="<?php echo $i; ?>" <?php echo $bulan == $i ? 'selected' : ''; ?>>
+                                        <?php echo date('F', mktime(0, 0, 0, $i, 1)); ?>
+                                    </option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tahun</label>
+                                <select name="tahun">
+                                    <?php for ($i = date('Y'); $i >= date('Y') - 5; $i--): ?>
+                                    <option value="<?php echo $i; ?>" <?php echo $tahun == $i ? 'selected' : ''; ?>>
+                                        <?php echo $i; ?>
+                                    </option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if ($jenis_laporan == 'pendapatan'): ?>
+                            <div class="form-group">
+                                <label>Tanggal Awal</label>
+                                <input type="date" name="tgl_awal" value="<?php echo $tgl_awal; ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>Tanggal Akhir</label>
+                                <input type="date" name="tgl_akhir" value="<?php echo $tgl_akhir; ?>">
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                        </div>
+                    </div>
                 </form>
             </div>
 
@@ -251,7 +267,10 @@
                             <?php foreach ($data_laporan as $d): ?>
                             <tr>
                                 <td><?php echo date('d/m/Y', strtotime($d['tgl_pengembalian'])); ?></td>
-                                <td><?php echo htmlspecialchars($d['merk']); ?><br><small><?php echo htmlspecialchars($d['no_plat']); ?></small></td>
+                                <td>
+                                    <?php echo htmlspecialchars($d['merk']); ?><br>
+                                    <small><?php echo htmlspecialchars($d['no_plat']); ?></small>
+                                </td>
                                 <td><?php echo htmlspecialchars($d['nama_pelanggan']); ?></td>
                                 <td><span class="badge <?php echo $d['kondisi'] == 'baik' ? 'badge-success' : 'badge-warning'; ?>"><?php echo ucwords(str_replace('_', ' ', $d['kondisi'])); ?></span></td>
                                 <td><strong>Rp <?php echo number_format($d['denda'] ?? 0, 0, ',', '.'); ?></strong></td>
