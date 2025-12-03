@@ -21,7 +21,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Data Kendaraan 🚗</h1>
+                    <h1>Data Kendaraan</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -43,9 +43,9 @@
             <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success">
                 <?php
-                if ($_GET['success'] == 'add') echo '✓ Kendaraan berhasil ditambahkan!';
-                elseif ($_GET['success'] == 'update') echo '✓ Kendaraan berhasil diupdate!';
-                elseif ($_GET['success'] == 'delete') echo '✓ Kendaraan berhasil dihapus!';
+                if ($_GET['success'] == 'add') echo 'Kendaraan berhasil ditambahkan!';
+                elseif ($_GET['success'] == 'update') echo 'Kendaraan berhasil diupdate!';
+                elseif ($_GET['success'] == 'delete') echo 'Kendaraan berhasil dihapus!';
                 ?>
             </div>
             <?php endif; ?>
@@ -179,11 +179,11 @@
                     <?php if ($is_rented): ?>
                         <input type="hidden" name="status" value="disewa">
                         <small style="color: #EF4444; font-size: 12px; display: block; margin-top: 5px; font-weight: bold;">
-                            🔒 Status terkunci karena mobil sedang dalam transaksi sewa.
+                            Status terkunci karena mobil sedang dalam transaksi sewa.
                         </small>
                     <?php else: ?>
                         <small style="color: #6B7280; font-size: 12px; display: block; margin-top: 5px;">
-                            ℹ️ Ubah status ke "Perbaikan" jika mobil sedang maintenance.
+                            Ubah status ke "Perbaikan" jika mobil sedang maintenance.
                         </small>
                     <?php endif; ?>
                 </div>

@@ -45,10 +45,8 @@ class PengembalianModel {
                 $data['keterangan']
             ]);
             
-            
             $stmt = $this->db->prepare("UPDATE rental SET status = 'selesai' WHERE id_rental = ?");
             $stmt->execute([$id_rental]);
-            
             
             $stmt = $this->db->prepare("SELECT id_kendaraan FROM rental WHERE id_rental = ?");
             $stmt->execute([$id_rental]);

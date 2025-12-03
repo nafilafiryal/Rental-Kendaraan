@@ -48,20 +48,6 @@ class PelangganModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-    public function create($data) {
-        $stmt = $this->db->prepare("
-            INSERT INTO pelanggan (nama, alamat, no_hp, no_ktp, email) 
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        return $stmt->execute([
-            $data['nama'], 
-            $data['alamat'], 
-            $data['no_hp'], 
-            $data['no_ktp'],
-            $data['email']
-        ]);
-    }
-    
     public function update($id, $data) {
         $stmt = $this->db->prepare("
             UPDATE pelanggan 

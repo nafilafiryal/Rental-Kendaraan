@@ -9,7 +9,6 @@ class LaporanModel {
         $this->db = $database->connect();
     }
     
-    
     public function getKendaraanPopuler($bulan = null, $tahun = null) {
         $where = "";
         if ($bulan && $tahun) {
@@ -18,7 +17,6 @@ class LaporanModel {
             $where = "WHERE EXTRACT(YEAR FROM r.tgl_sewa) = $tahun";
         }
 
-        
         $sql = "
             SELECT 
                 k.id_kendaraan, 
@@ -38,7 +36,6 @@ class LaporanModel {
         
         return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
-    
     
     public function getPendapatanRental($tgl_awal = null, $tgl_akhir = null) {
         $where = "";
@@ -65,7 +62,6 @@ class LaporanModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    
     public function getUtilisasiKendaraan() {
         
         $sql = "
@@ -90,7 +86,6 @@ class LaporanModel {
         return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    
     public function getPelangganAktif() {
         $sql = "
             SELECT 
@@ -108,7 +103,6 @@ class LaporanModel {
         
         return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
-    
     
     public function getLaporanPengembalian($bulan = null, $tahun = null) {
         
@@ -130,7 +124,6 @@ class LaporanModel {
         
         return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
-    
     
     public function refreshMaterializedView($view_name) {
         
