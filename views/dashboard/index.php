@@ -20,7 +20,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Dashboard Admin 🚗</h1>
+                    <h1>Dashboard Admin</h1>
                     <p>Selamat datang, <?php echo htmlspecialchars($_SESSION['nama'] ?? 'Admin'); ?>!</p>
                 </div>
             </div>

@@ -21,7 +21,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Pengembalian 🔄</h1>
+                    <h1>Pengembalian</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -39,11 +39,11 @@
             </div>
 
             <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success">✓ Pengembalian berhasil diproses!</div>
+            <div class="alert alert-success">Pengembalian berhasil diproses!</div>
             <?php endif; ?>
 
             <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger">⚠️ <?php echo htmlspecialchars($error_message); ?></div>
+            <div class="alert alert-danger"> <?php echo htmlspecialchars($error_message); ?></div>
             <?php endif; ?>
 
             <h3 style="margin: 24px 0 16px 0; color: #2C1810;">Rental Aktif</h3>

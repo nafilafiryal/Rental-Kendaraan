@@ -2,7 +2,7 @@
 class Database {
     private $host = 'localhost';
     private $port = '5433';
-    private $dbname = 'rental_kendaraan1';
+    private $dbname = 'rental_kendaraan';
     private $username = 'postgres';
     private $password = '12345678';
     private $pdo;
