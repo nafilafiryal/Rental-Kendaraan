@@ -47,7 +47,7 @@
             </div>
 
             <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success">✓ Pengembalian berhasil diproses!</div>
+            <div class="alert alert-success">Pengembalian berhasil diproses!</div>
             <?php endif; ?>
 
             <?php if (isset($error_message)): ?>
