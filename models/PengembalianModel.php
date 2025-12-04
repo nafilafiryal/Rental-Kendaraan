@@ -32,7 +32,6 @@ class PengembalianModel {
         try {
             $this->db->beginTransaction();
             
-            
             $stmt = $this->db->prepare("
                 INSERT INTO pengembalian (id_rental, tanggal_kembali, kondisi, denda, keterangan) 
                 VALUES (?, ?, ?, ?, ?)
@@ -45,17 +44,14 @@ class PengembalianModel {
                 $data['keterangan']
             ]);
             
-            
             $stmt = $this->db->prepare("UPDATE rental SET status = 'selesai' WHERE id_rental = ?");
             $stmt->execute([$id_rental]);
-            
             
             $stmt = $this->db->prepare("SELECT id_kendaraan FROM rental WHERE id_rental = ?");
             $stmt->execute([$id_rental]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($row) {
-                
                 $status_baru = ($data['kondisi'] == 'baik') ? 'tersedia' : 'perbaikan';
                 $stmt = $this->db->prepare("CALL update_status_kendaraan(?, ?)");
                 $stmt->execute([$row['id_kendaraan'], $status_baru]);
@@ -70,7 +66,6 @@ class PengembalianModel {
     }
     
     public function hitungDenda($id_rental, $tgl_pengembalian) {
-
         $stmt = $this->db->prepare("
             SELECT hitung_denda(
                 GREATEST(
@@ -89,12 +84,14 @@ class PengembalianModel {
     }
     
     public function getAll($limit = 10, $offset = 0) {
-        
+        // UPDATE: Menambahkan r.tgl_kembali sebagai 'tgl_rencana'
         $stmt = $this->db->query("
             SELECT 
                 p.id_pengembalian,
                 p.id_rental,
-                p.tanggal_kembali as tgl_pengembalian, 
+                p.tanggal_kembali as tgl_pengembalian, /* Tanggal Realisasi */
+                r.tgl_sewa,                            /* Tanggal Mulai */
+                r.tgl_kembali as tgl_rencana,          /* Tanggal Rencana/Tenggat */
                 p.kondisi,
                 p.denda,
                 p.keterangan,

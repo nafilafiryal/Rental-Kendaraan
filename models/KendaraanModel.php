@@ -85,8 +85,6 @@ class KendaraanModel {
         return $stmt->execute([$id]);
     }
     
-
-    
     public function getTotalKendaraan() {
         $stmt = $this->db->query("SELECT COUNT(*) as total FROM kendaraan");
         return $stmt->fetch(PDO::FETCH_ASSOC)['total'];

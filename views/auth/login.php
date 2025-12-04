@@ -22,11 +22,11 @@
 
             <div class="login-title">
                 <h2>Login</h2>
-                <p>Hi, Welcome back 👋</p>
+                <p>Hi, Welcome back</p>
             </div>
 
             <?php if (isset($error_message) && $error_message): ?>
-            <div class="error-message">⚠️ <?php echo htmlspecialchars($error_message); ?></div>
+            <div class="error-message"> <?php echo htmlspecialchars($error_message); ?></div>
             <?php endif; ?>
 
             <form method="POST" id="loginForm">

@@ -14,28 +14,27 @@ class LaporanController {
     }
     
     public function index() {
-        // Handle Refresh Materialized View
         if (isset($_GET['refresh_mv'])) {
             try {
-                // Pastikan nama MV sesuai dengan yang di database
                 $this->laporanModel->refreshMaterializedView('mv_kendaraan_populer');
                 header("Location: index.php?page=laporan&jenis=materialized_view&success=refresh");
             } catch (Exception $e) {
-                // Jika error, kembalikan ke halaman laporan dengan pesan error
                 header("Location: index.php?page=laporan&jenis=materialized_view&error=refresh");
             }
             exit();
         }
         
-        // Ambil parameter filter
         $jenis_laporan = isset($_GET['jenis']) ? $_GET['jenis'] : 'kendaraan_populer';
+        
+        // Ambil Filter dari URL
         $bulan = isset($_GET['bulan']) ? $_GET['bulan'] : null;
         $tahun = isset($_GET['tahun']) ? $_GET['tahun'] : date('Y');
         $tgl_awal = isset($_GET['tgl_awal']) ? $_GET['tgl_awal'] : null;
         $tgl_akhir = isset($_GET['tgl_akhir']) ? $_GET['tgl_akhir'] : null;
         
-        // Ambil data sesuai jenis laporan
         $data_laporan = [];
+        
+        // PERBAIKAN: Kirim $bulan dan $tahun ke semua fungsi yang butuh filter
         switch ($jenis_laporan) {
             case 'kendaraan_populer':
                 $data_laporan = $this->laporanModel->getKendaraanPopuler($bulan, $tahun);
@@ -44,10 +43,12 @@ class LaporanController {
                 $data_laporan = $this->laporanModel->getPendapatanRental($tgl_awal, $tgl_akhir);
                 break;
             case 'utilisasi':
-                $data_laporan = $this->laporanModel->getUtilisasiKendaraan();
+                // Update: Kirim parameter filter
+                $data_laporan = $this->laporanModel->getUtilisasiKendaraan($bulan, $tahun);
                 break;
             case 'pelanggan':
-                $data_laporan = $this->laporanModel->getPelangganAktif();
+                // Update: Kirim parameter filter
+                $data_laporan = $this->laporanModel->getPelangganAktif($bulan, $tahun);
                 break;
             case 'pengembalian':
                 $data_laporan = $this->laporanModel->getLaporanPengembalian($bulan, $tahun);
@@ -57,7 +58,6 @@ class LaporanController {
                 break;
         }
         
-        // Load View
         require_once 'views/laporan/index.php';
     }
     
@@ -75,10 +75,10 @@ class LaporanController {
                 $data = $this->laporanModel->getPendapatanRental($_GET['tgl_awal'] ?? null, $_GET['tgl_akhir'] ?? null);
                 break;
             case 'utilisasi':
-                $data = $this->laporanModel->getUtilisasiKendaraan();
+                $data = $this->laporanModel->getUtilisasiKendaraan($bulan, $tahun);
                 break;
             case 'pelanggan':
-                $data = $this->laporanModel->getPelangganAktif();
+                $data = $this->laporanModel->getPelangganAktif($bulan, $tahun);
                 break;
             case 'pengembalian':
                 $data = $this->laporanModel->getLaporanPengembalian($bulan, $tahun);
@@ -92,10 +92,9 @@ class LaporanController {
         header('Content-Disposition: attachment; filename=laporan_' . $jenis_laporan . '_' . date('Y-m-d') . '.csv');
         
         $output = fopen('php://output', 'w');
-        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM untuk Excel
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
         
         if (!empty($data)) {
-            // Ambil header dari key data pertama
             fputcsv($output, array_keys($data[0]));
             foreach ($data as $row) {
                 fputcsv($output, $row);

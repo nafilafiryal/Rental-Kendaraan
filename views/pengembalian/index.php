@@ -6,6 +6,13 @@
     <title>Pengembalian Kendaraan - Rental Kendaraan</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/crud.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* Fix style input flatpickr */
+        .flatpickr-input {
+            background-color: #fff !important;
+        }
+    </style>
 </head>
 <body>
     <?php include 'views/layouts/sidebar.php'; ?>
@@ -21,7 +28,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Pengembalian 🔄</h1>
+                    <h1>Pengembalian</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -33,13 +40,14 @@
                 </div>
             </div>
         </header>
+
         <div class="content-wrapper">
             <div class="page-header">
                 <h2>Proses Pengembalian</h2>
             </div>
 
             <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success">✓ Pengembalian berhasil diproses!</div>
+            <div class="alert alert-success">Pengembalian berhasil diproses!</div>
             <?php endif; ?>
 
             <?php if (isset($error_message)): ?>
@@ -110,7 +118,9 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Tgl Pengembalian</th>
+                            <th>Tgl Sewa</th>
+                            <th>Tenggat (Rencana)</th>
+                            <th>Tgl Kembali (Realisasi)</th>
                             <th>Kendaraan</th>
                             <th>Pelanggan</th>
                             <th>Kondisi</th>
@@ -122,7 +132,15 @@
                         <?php if (!empty($riwayat_pengembalian)): ?>
                             <?php foreach ($riwayat_pengembalian as $p): ?>
                             <tr>
-                                <td><?php echo !empty($p['tgl_pengembalian']) ? date('d/m/Y', strtotime($p['tgl_pengembalian'])) : '-'; ?></td>
+                                <td><?php echo !empty($p['tgl_sewa']) ? date('d/m/y', strtotime($p['tgl_sewa'])) : '-'; ?></td>
+                                <td><?php echo !empty($p['tgl_rencana']) ? date('d/m/y', strtotime($p['tgl_rencana'])) : '-'; ?></td>
+                                <td>
+                                    <?php 
+                                        $tgl_real = !empty($p['tgl_pengembalian']) ? date('d/m/y', strtotime($p['tgl_pengembalian'])) : '-';
+                                        $is_late = ($p['denda'] > 0);
+                                        echo $is_late ? "<span style='color:red; font-weight:bold;'>$tgl_real</span>" : $tgl_real;
+                                    ?>
+                                </td>
                                 <td>
                                     <?php echo htmlspecialchars($p['merk']); ?><br>
                                     <small><?php echo htmlspecialchars($p['no_plat']); ?></small>
@@ -136,13 +154,19 @@
                                         <?php echo ucwords(str_replace('_', ' ', $p['kondisi'])); ?>
                                     </span>
                                 </td>
-                                <td><strong>Rp <?php echo number_format($p['denda'], 0, ',', '.'); ?></strong></td>
+                                <td>
+                                    <?php if ($p['denda'] > 0): ?>
+                                        <strong style="color: #DC2626;">Rp <?php echo number_format($p['denda'], 0, ',', '.'); ?></strong>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo htmlspecialchars($p['keterangan'] ?? '-'); ?></td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" style="text-align: center;">Belum ada riwayat pengembalian</td>
+                                <td colspan="8" style="text-align: center;">Belum ada riwayat pengembalian</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -173,10 +197,8 @@
                 <input type="hidden" name="id_rental" id="id_rental">
                 
                 <div class="form-group">
-                    <label>Tanggal Pengembalian *</label>
-                    <input type="date" name="tgl_pengembalian" id="tgl_pengembalian" required 
-                           max="<?php echo date('Y-m-d'); ?>" 
-                           onchange="hitungDenda()">
+                    <label>Tanggal Pengembalian (Realisasi) *</label>
+                    <input type="text" class="datepicker" name="tgl_pengembalian" id="tgl_pengembalian" required placeholder="Pilih tanggal kembali...">
                 </div>
                 
                 <div class="form-group">
@@ -192,7 +214,7 @@
                     <label>Denda Keterlambatan</label>
                     <input type="text" id="denda_display" readonly style="background: #FEE2E2; font-weight: bold; color: #991B1B;">
                     <input type="hidden" name="denda" id="denda" value="0">
-                    <small>Denda Rp 50.000/hari untuk keterlambatan</small>
+                    <small>Denda Rp 50.000/hari (Dihitung otomatis oleh Database)</small>
                 </div>
                 
                 <div class="form-group">
@@ -208,6 +230,68 @@
         </div>
     </div>
 
+    <script src="assets/js/modal.js"></script>
     <script src="assets/js/pengembalian.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
+    <script>
+        // Inisialisasi Flatpickr
+        const fp = flatpickr(".datepicker", {
+            altInput: true,
+            altFormat: "j F Y", // Format Tampilan: 27 November 2025
+            dateFormat: "Y-m-d", // Format Database
+            locale: "id",
+            defaultDate: "today", // Default hari ini
+            onChange: function(selectedDates, dateStr, instance) {
+                // Panggil fungsi hitung denda saat tanggal berubah
+                hitungDenda();
+            }
+        });
+
+        // Override fungsi openPengembalianModal agar support Flatpickr
+        // Kita simpan referensi fungsi asli (jika ada di pengembalian.js) atau buat baru
+        const originalOpenModal = window.openPengembalianModal;
+
+        window.openPengembalianModal = function(rentalData) {
+            // Panggil logika asli dulu (set ID rental, info rental, dll)
+            // Pastikan Anda menyalin logika pengisian info rental di sini jika pengembalian.js tidak di-load dengan benar
+            // Tapi asumsinya pengembalian.js sudah ada dan berfungsi.
+            
+            // Set ID rental
+            document.getElementById('id_rental').value = rentalData.id_rental;
+            currentRental = rentalData; // Variable global dari pengembalian.js
+
+            // Tampilkan Info Rental
+            const rentalInfo = document.getElementById('rentalInfo');
+            rentalInfo.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><strong>Kendaraan:</strong><br>${rentalData.merk} - ${rentalData.no_plat}</div>
+                    <div><strong>Pelanggan:</strong><br>${rentalData.nama_pelanggan}</div>
+                    <div><strong>Tgl Sewa:</strong><br>${formatDate(rentalData.tgl_sewa)}</div>
+                    <div><strong>Tenggat:</strong><br>${formatDate(rentalData.tgl_kembali)}</div>
+                </div>
+            `;
+
+            // Reset Form
+            document.getElementById('kondisi').value = 'baik';
+            document.getElementById('keterangan').value = '';
+
+            // Update Flatpickr ke Hari Ini
+            fp.setDate(new Date());
+            
+            // Hitung Denda Awal
+            hitungDenda();
+
+            // Tampilkan Modal
+            document.getElementById('pengembalianModal').classList.add('active');
+        }
+
+        // Helper format tanggal untuk info
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+    </script>
 </body>
 </html>

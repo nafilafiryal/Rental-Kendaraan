@@ -17,11 +17,11 @@
         </a>
         <a href="index.php?page=kendaraan" class="nav-item <?php echo (isset($_GET['page']) && $_GET['page'] == 'kendaraan') ? 'active' : ''; ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-4H5v4zm3-8l2-3h4l2 3"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
-            Kendaraan (CRUD)
+            Kendaraan
         </a>
         <a href="index.php?page=pelanggan" class="nav-item <?php echo (isset($_GET['page']) && $_GET['page'] == 'pelanggan') ? 'active' : ''; ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            Pelanggan (CRUD)
+            Pelanggan
         </a>
         <a href="index.php?page=rental" class="nav-item <?php echo (isset($_GET['page']) && $_GET['page'] == 'rental') ? 'active' : ''; ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>

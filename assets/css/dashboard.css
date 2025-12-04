@@ -228,7 +228,6 @@ body {
     gap: 24px;
 }
 
-
 .card {
     background-color: #FFFFFF;
     border-radius: 12px;
@@ -400,7 +399,6 @@ table td small {
     }
 }
 
-
 .menu-toggle {
     display: none;
     background: none;
@@ -451,7 +449,6 @@ table td small {
     display: block;
 }
 
-
 @media (max-width: 768px) {
     
     .sidebar {
@@ -465,24 +462,20 @@ table td small {
         box-shadow: 4px 0 15px rgba(0,0,0,0.2);
     }
 
-
     .sidebar.active {
         left: 0 !important;
     }
-
     
     .main-content {
         margin-left: 0 !important;
         width: 100% !important;
         padding: 16px;
     }
-
     
     .menu-toggle {
         display: block !important;
     }
 
-    
     .header {
         padding: 16px;
         gap: 10px;
@@ -491,7 +484,6 @@ table td small {
     .header-right {
         display: none; 
     }
-
     
     .table-container {
         overflow-x: auto;

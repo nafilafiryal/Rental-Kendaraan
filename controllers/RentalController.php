@@ -58,36 +58,23 @@ class RentalController {
             }
             exit();
         }
-        
-        
+              
         $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
         $per_page = 10;
         $offset = ($page - 1) * $per_page;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-        
-        
+
         $total_records = $this->rentalModel->count($search);
         $total_pages = ceil($total_records / $per_page);
-        $rental_list = $this->rentalModel->getAll($search, $per_page, $offset);
-        
-        
-        
-        
-        $pelanggan_list = $this->pelangganModel->getAll('', 1000, 0);
-        
-        
-        $sopir_list = $this->sopirModel->getAll();
-        
-        
-        $semua_kendaraan = $this->kendaraanModel->getAll('', 1000, 0);
-        
-        
+        $rental_list = $this->rentalModel->getAll($search, $per_page, $offset);       
+        $pelanggan_list = $this->pelangganModel->getAll('', 1000, 0);                
+        $sopir_list = $this->sopirModel->getAll();                
+        $semua_kendaraan = $this->kendaraanModel->getAll('', 1000, 0);                
         $kendaraan_tersedia = array_filter($semua_kendaraan, function($k) {
         
             return strtolower($k['status']) === 'tersedia';
         });
-        
-       
+              
         $view_data = null;
         if (isset($_GET['view'])) {
             $view_data = $this->rentalModel->getById($_GET['view']);

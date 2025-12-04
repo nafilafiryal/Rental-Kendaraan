@@ -25,8 +25,7 @@ class KendaraanController {
             header("Location: index.php?page=kendaraan&success=delete");
             exit();
         }
-        
-        
+                
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
                 'no_plat' => trim($_POST['no_plat']),
@@ -46,22 +45,18 @@ class KendaraanController {
             }
             exit();
         }
-        
-        
+                
         $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
         $per_page = 10;
         $offset = ($page - 1) * $per_page;
-        
-        
+                
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-        
-        
+                
         $total_records = $this->kendaraanModel->count($search);
         $total_pages = ceil($total_records / $per_page);
         $kendaraan_list = $this->kendaraanModel->getAll($search, $per_page, $offset);
         $tipe_list = $this->tipeModel->getAll();
-        
-        
+               
         $edit_data = null;
         if (isset($_GET['edit'])) {
             $edit_data = $this->kendaraanModel->getById($_GET['edit']);

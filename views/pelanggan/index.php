@@ -21,7 +21,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Data Pelanggan 👥</h1>
+                    <h1>Data Pelanggan</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -36,21 +36,20 @@
         <div class="content-wrapper">
             <div class="page-header">
                 <h2>Daftar Member</h2>
-                <button class="btn btn-primary" onclick="openModal()">+ Tambah Pelanggan</button>
             </div>
 
             <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success">
                 <?php
-                if ($_GET['success'] == 'add') echo '✓ Pelanggan berhasil ditambahkan!';
-                elseif ($_GET['success'] == 'update') echo '✓ Pelanggan berhasil diupdate!';
-                elseif ($_GET['success'] == 'delete') echo '✓ Pelanggan berhasil dihapus!';
+                if ($_GET['success'] == 'add') echo 'Pelanggan berhasil ditambahkan!';
+                elseif ($_GET['success'] == 'update') echo 'Pelanggan berhasil diupdate!';
+                elseif ($_GET['success'] == 'delete') echo 'Pelanggan berhasil dihapus!';
                 ?>
             </div>
             <?php endif; ?>
 
             <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger">⚠️ <?php echo htmlspecialchars($error_message); ?></div>
+            <div class="alert alert-danger"> <?php echo htmlspecialchars($error_message); ?></div>
             <?php endif; ?>
 
             <div class="search-bar">
@@ -116,8 +115,7 @@
     <div id="formModal" class="modal <?php echo $edit_data ? 'active' : ''; ?>">
         <div class="modal-content">
             <h2 id="modalTitle"><?php echo $edit_data ? 'Edit Pelanggan' : 'Tambah Pelanggan'; ?></h2>
-            <form method="POST" id="pelangganForm">
-                <input type="hidden" name="page" value="pelanggan">
+            <form method="POST" action="index.php?page=pelanggan" enctype="application/x-www-form-urlencoded">
                 <input type="hidden" name="id_pelanggan" id="id_pelanggan" value="<?php echo $edit_data['id_pelanggan'] ?? ''; ?>">
                 
                 <div class="form-group">

@@ -35,7 +35,7 @@
                 <button class="menu-toggle" onclick="toggleSidebar()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
-                <div><h1>Transaksi Rental 📄</h1></div>
+                <div><h1>Transaksi Rental</h1></div>
             </div>
             <div class="header-right">
                 <div class="user-info">
@@ -54,9 +54,9 @@
             <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success">
                 <?php 
-                if ($_GET['success'] == 'add') echo '✓ Transaksi rental berhasil ditambahkan!'; 
-                elseif ($_GET['success'] == 'delete') echo '✓ Transaksi berhasil dihapus!'; 
-                elseif ($_GET['success'] == 'activate') echo '✓ Booking berhasil diaktifkan (Berjalan)!'; 
+                if ($_GET['success'] == 'add') echo 'Transaksi rental berhasil ditambahkan!'; 
+                elseif ($_GET['success'] == 'delete') echo 'Transaksi berhasil dihapus!'; 
+                elseif ($_GET['success'] == 'activate') echo 'Booking berhasil diaktifkan (Berjalan)!'; 
                 ?>
             </div>
             <?php endif; ?>
@@ -92,7 +92,7 @@
                             <td><?php echo htmlspecialchars($r['nama_pelanggan']); ?></td>
                             <td>
                                 <?php if (!empty($r['nama_sopir'])): ?>
-                                    <span style="color: #059669; font-weight: 500;">👨‍✈️ <?php echo htmlspecialchars($r['nama_sopir']); ?></span>
+                                    <span style="color: #059669; font-weight: 500;"> <?php echo htmlspecialchars($r['nama_sopir']); ?></span>
                                 <?php else: ?>
                                     <span style="color: #6B7280;">Lepas Kunci</span>
                                 <?php endif; ?>
@@ -110,14 +110,14 @@
                             </td>
                             <td>
                                 <div style="display: flex; gap: 5px;">
-                                    <a href="index.php?page=rental&view=<?php echo $r['id_rental']; ?>" class="btn btn-info" style="padding: 6px 10px;">👁️</a>
+                                    <a href="index.php?page=rental&view=<?php echo $r['id_rental']; ?>" class="btn btn-info" style="padding: 6px 10px;">Lihat</a>
                                     
                                     <?php if ($r['status'] == 'booking'): ?>
-                                        <a href="index.php?page=rental&activate=<?php echo $r['id_rental']; ?>" class="btn btn-success" style="padding: 6px 10px;" onclick="return confirm('Pelanggan sudah mengambil unit? Aktifkan rental ini sekarang?')" title="Ambil Unit">🚗 Ambil</a>
-                                        <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" style="padding: 6px 10px;" onclick="return confirm('Batalkan booking ini?')">❌</a>
+                                        <a href="index.php?page=rental&activate=<?php echo $r['id_rental']; ?>" class="btn btn-success" style="padding: 6px 10px;" onclick="return confirm('Pelanggan sudah mengambil unit? Aktifkan rental ini sekarang?')" title="Ambil Unit">Ambil</a>
+                                        <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" style="padding: 6px 10px;" onclick="return confirm('Batalkan booking ini?')">Batalkan</a>
                                     
                                     <?php elseif ($r['status'] == 'berjalan'): ?>
-                                        <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" style="padding: 6px 10px;" onclick="return confirm('Hapus transaksi berjalan?')">❌</a>
+                                        <a href="index.php?page=rental&delete=<?php echo $r['id_rental']; ?>" class="btn btn-danger" style="padding: 6px 10px;" onclick="return confirm('Hapus transaksi berjalan?')">Hapus</a>
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -173,7 +173,7 @@
                         <div class="form-group" style="margin-bottom: 0;">
                             <label for="id_sopir">Pilih Sopir *</label>
                             <select name="id_sopir" id="id_sopir" onchange="hitungTotal()" style="background: white;">
-                                <option value="">-- Pilih Sopir Tersedia --</option>
+                                <option value="">Pilih Sopir Tersedia</option>
                                 <?php foreach ($sopir_list as $s): ?>
                                 <option value="<?php echo $s['id_sopir']; ?>" data-tarif="<?php echo $s['tarif_harian']; ?>">
                                     <?php echo htmlspecialchars($s['nama']); ?> (Rp <?php echo number_format($s['tarif_harian'], 0, ',', '.'); ?>/hari)
