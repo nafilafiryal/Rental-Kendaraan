@@ -28,7 +28,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Pengembalian 🔄</h1>
+                    <h1>Pengembalian</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -47,7 +47,7 @@
             </div>
 
             <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success">✓ Pengembalian berhasil diproses!</div>
+            <div class="alert alert-success">Pengembalian berhasil diproses!</div>
             <?php endif; ?>
 
             <?php if (isset($error_message)): ?>
