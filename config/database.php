@@ -2,10 +2,10 @@
 //coba
 class Database {
     private $host = 'localhost';
-    private $port = '5433';
+    private $port = '5432';
     private $dbname = 'rental_kendaraan1';
     private $username = 'postgres';
-    private $password = '12345678';
+    private $password = 'password123';
     private $pdo;
     
     public function connect() {
