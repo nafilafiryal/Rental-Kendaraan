@@ -50,7 +50,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Laporan & Analitik 📊</h1>
+                    <h1>Laporan & Analitik</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -68,21 +68,21 @@
                 <h2>Filter Laporan</h2>
                 <a href="index.php?page=laporan&action=export&jenis=<?php echo $jenis_laporan; ?>&bulan=<?php echo $bulan; ?>&tahun=<?php echo $tahun; ?>&tgl_awal=<?php echo $tgl_awal; ?>&tgl_akhir=<?php echo $tgl_akhir; ?>" 
                    class="btn btn-success">
-                    📥 Export CSV
+                    Export CSV
                 </a>
             </div>
 
             <?php if (isset($_GET['success']) && $_GET['success'] == 'refresh'): ?>
-            <div class="alert alert-success">✓ Materialized View berhasil di-refresh!</div>
+            <div class="alert alert-success">Materialized View berhasil di-refresh!</div>
             <?php endif; ?>
 
             <div class="laporan-tabs">
-                <a href="index.php?page=laporan&jenis=kendaraan_populer" class="<?php echo $jenis_laporan == 'kendaraan_populer' ? 'active' : ''; ?>">📊 Kendaraan Populer</a>
-                <a href="index.php?page=laporan&jenis=pendapatan" class="<?php echo $jenis_laporan == 'pendapatan' ? 'active' : ''; ?>">💰 Pendapatan</a>
-                <a href="index.php?page=laporan&jenis=utilisasi" class="<?php echo $jenis_laporan == 'utilisasi' ? 'active' : ''; ?>">🚗 Utilisasi Kendaraan</a>
-                <a href="index.php?page=laporan&jenis=pelanggan" class="<?php echo $jenis_laporan == 'pelanggan' ? 'active' : ''; ?>">👥 Pelanggan Aktif</a>
-                <a href="index.php?page=laporan&jenis=pengembalian" class="<?php echo $jenis_laporan == 'pengembalian' ? 'active' : ''; ?>">🔄 Pengembalian</a>
-                <a href="index.php?page=laporan&jenis=materialized_view" class="<?php echo $jenis_laporan == 'materialized_view' ? 'active' : ''; ?>">⚡ Materialized View</a>
+                <a href="index.php?page=laporan&jenis=kendaraan_populer" class="<?php echo $jenis_laporan == 'kendaraan_populer' ? 'active' : ''; ?>">Kendaraan Populer</a>
+                <a href="index.php?page=laporan&jenis=pendapatan" class="<?php echo $jenis_laporan == 'pendapatan' ? 'active' : ''; ?>">Pendapatan</a>
+                <a href="index.php?page=laporan&jenis=utilisasi" class="<?php echo $jenis_laporan == 'utilisasi' ? 'active' : ''; ?>">Utilisasi Kendaraan</a>
+                <a href="index.php?page=laporan&jenis=pelanggan" class="<?php echo $jenis_laporan == 'pelanggan' ? 'active' : ''; ?>">Pelanggan Aktif</a>
+                <a href="index.php?page=laporan&jenis=pengembalian" class="<?php echo $jenis_laporan == 'pengembalian' ? 'active' : ''; ?>">Pengembalian</a>
+                <a href="index.php?page=laporan&jenis=materialized_view" class="<?php echo $jenis_laporan == 'materialized_view' ? 'active' : ''; ?>">Materialized View</a>
             </div>
 
             <div class="filter-box">
@@ -283,9 +283,9 @@
 
             <?php elseif ($jenis_laporan == 'materialized_view'): ?>
                 <div style="background: #FEF3C7; border: 1px solid #F59E0B; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="color: #92400E; margin-bottom: 8px;">⚡ Materialized View untuk Performance</h4>
+                    <h4 style="color: #92400E; margin-bottom: 8px;">Materialized View untuk Performance</h4>
                     <p style="color: #78350F; font-size: 14px; margin-bottom: 12px;">Materialized View menyimpan hasil query yang sudah di-cache untuk performa lebih cepat. Klik tombol refresh untuk update data terbaru.</p>
-                    <a href="index.php?page=laporan&jenis=materialized_view&refresh_mv=1" class="btn btn-primary" onclick="return confirm('Refresh materialized view? Ini akan update data cache.')">🔄 Refresh Materialized View</a>
+                    <a href="index.php?page=laporan&jenis=materialized_view&refresh_mv=1" class="btn btn-primary" onclick="return confirm('Refresh materialized view? Ini akan update data cache.')">Refresh Materialized View</a>
                 </div>
                 <h3>Data dari Materialized View: mv_kendaraan_populer</h3>
                 <div class="table-container">

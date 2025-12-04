@@ -28,7 +28,7 @@
                     </svg>
                 </button>
                 <div>
-                    <h1>Pengembalian 🔄</h1>
+                    <h1>Pengembalian</h1>
                 </div>
             </div>
             <div class="header-right">
