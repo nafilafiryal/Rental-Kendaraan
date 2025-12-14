@@ -16,6 +16,23 @@ class PelangganController {
     }
     
     public function index() {
+
+        if (isset($_GET['action']) && $_GET['action'] == 'api_check_pelanggan') {
+            // Ambil parameter dari URL (bisa KTP, bisa HP)
+            $ktp = isset($_GET['no_ktp']) ? trim($_GET['no_ktp']) : '';
+            $hp = isset($_GET['no_hp']) ? trim($_GET['no_hp']) : '';
+            
+            // Cari data menggunakan fungsi yang sudah support keduanya
+            $pelanggan = $this->pelangganModel->findByKtpOrHp($ktp, $hp); 
+            
+            header('Content-Type: application/json');
+            if ($pelanggan) {
+                echo json_encode(['status' => 'found', 'data' => $pelanggan]);
+            } else {
+                echo json_encode(['status' => 'not_found']);
+            }
+            exit();
+        }
         // Handle Delete
         if (isset($_GET['delete'])) {
             $this->pelangganModel->delete($_GET['delete']);
@@ -75,4 +92,5 @@ class PelangganController {
         require_once 'views/pelanggan/index.php';
     }
 }
+
 ?>

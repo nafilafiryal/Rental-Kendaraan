@@ -41,20 +41,75 @@ class RentalController {
         }
         
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $data = [
-                'id_kendaraan' => $_POST['id_kendaraan'],
-                'id_pelanggan' => $_POST['id_pelanggan'],
-                'id_sopir' => (!empty($_POST['pakai_sopir']) && !empty($_POST['id_sopir'])) ? $_POST['id_sopir'] : null,
-                'tgl_sewa' => $_POST['tgl_sewa'],
-                'tgl_kembali' => $_POST['tgl_kembali'],
-                'total_harga' => $_POST['total_harga']
-            ];
-            
             try {
-                $this->rentalModel->create($data);
-                header("Location: index.php?page=rental&success=add");
+                // LOGIKA BARU: Cek apakah input pelanggan baru atau pilih lama
+                $id_pelanggan_fix = null;
+                $pesan_info = null;
+
+                if (isset($_POST['mode_pelanggan']) && $_POST['mode_pelanggan'] == 'baru') {
+                    // Ambil inputan
+                    $hp_baru = trim($_POST['hp_baru']);
+                    $ktp_baru = trim($_POST['ktp_baru']);
+                    
+                    // 1. CEK DULU: Apakah No HP atau KTP ini sudah ada di database?
+                    $existing = $this->pelangganModel->findByKtpOrHp($ktp_baru, $hp_baru);
+                    
+                    if ($existing) {
+                        // KASUS: Data Sudah Ada (Duplikat HP atau KTP)
+                        // Solusi: Gunakan ID pelanggan yang sudah ada (Auto-Merge)
+                        $id_pelanggan_fix = $existing['id_pelanggan'];
+                        
+                        // Beri info ke admin bahwa data lama yang dipakai
+                        $pesan_info = "Nomor HP/KTP sudah terdaftar a.n " . $existing['nama'] . ". Transaksi otomatis digabungkan ke data lama.";
+                        
+                    } else {
+                        // KASUS: Data Benar-benar Baru -> Buat Baru
+                        $dataPelanggan = [
+                            'nama' => trim($_POST['nama_baru']),
+                            'no_ktp' => $ktp_baru,
+                            'no_hp' => $hp_baru,
+                            'alamat' => trim($_POST['alamat_baru']),
+                            'email' => !empty($_POST['email_baru']) ? trim($_POST['email_baru']) : null
+                        ];
+                        
+                        // Simpan dan ambil ID barunya
+                        $id_pelanggan_fix = $this->pelangganModel->create($dataPelanggan);
+                    }
+                    
+                } else {
+                    // 2. Jika Mode Pilih Pelanggan Lama
+                    $id_pelanggan_fix = $_POST['id_pelanggan'];
+                }
+
+                // Validasi akhir ID Pelanggan
+                if (!$id_pelanggan_fix) {
+                    throw new Exception("Data pelanggan tidak valid.");
+                }
+
+                // 3. Simpan Data Rental menggunakan ID Pelanggan yang sudah dipastikan (Baru/Lama)
+                $dataRental = [
+                    'id_kendaraan' => $_POST['id_kendaraan'],
+                    'id_pelanggan' => $id_pelanggan_fix, 
+                    'id_sopir' => (!empty($_POST['pakai_sopir']) && !empty($_POST['id_sopir'])) ? $_POST['id_sopir'] : null,
+                    'tgl_sewa' => $_POST['tgl_sewa'],
+                    'tgl_kembali' => $_POST['tgl_kembali'],
+                    'total_harga' => $_POST['total_harga']
+                ];
+                
+                $this->rentalModel->create($dataRental);
+                
+                // Redirect dengan pesan sukses (dan info jika ada merge)
+                $url = "index.php?page=rental&success=add";
+                if ($pesan_info) {
+                    $url .= "&info=" . urlencode($pesan_info);
+                }
+                
+                header("Location: " . $url);
+                
             } catch (Exception $e) {
-                $error_message = "Gagal: " . $e->getMessage();
+                // Tangkap error lain (misal koneksi putus)
+                $error = urlencode($e->getMessage());
+                header("Location: index.php?page=rental&error=" . $error);
             }
             exit();
         }
