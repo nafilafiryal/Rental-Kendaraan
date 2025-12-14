@@ -61,6 +61,14 @@
             </div>
             <?php endif; ?>
 
+
+            <?php if (isset($_GET['info'])): ?>
+            <div class="alert alert-info" style="border-left: 4px solid #3B82F6;">
+                ℹ️ <?php echo htmlspecialchars($_GET['info']); ?>
+            </div>
+            <?php endif; ?>
+
+
             <div class="search-bar">
                 <form method="GET" style="display: flex; gap: 12px; flex: 1;">
                     <input type="hidden" name="page" value="rental">
@@ -135,20 +143,63 @@
             <form method="POST" id="rentalForm">
                 <input type="hidden" name="page" value="rental">
                 
-                <div class="form-group">
-                    <label>Pelanggan *</label>
-                    <select name="id_pelanggan" required>
-                        <option value="">Pilih Pelanggan</option>
+                <div class="form-group" style="background: #F3F4F6; padding: 10px; border-radius: 8px;">
+                    <label style="margin-bottom: 8px; display:block;">Data Pelanggan:</label>
+                    <div style="display: flex; gap: 20px;">
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            <input type="radio" name="mode_pelanggan" value="lama" checked onclick="toggleModePelanggan('lama')"> 
+                            Pilih Member Lama
+                        </label>
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            <input type="radio" name="mode_pelanggan" value="baru" onclick="toggleModePelanggan('baru')"> 
+                            + Input Pelanggan Baru
+                        </label>
+                    </div>
+                </div>
+
+                <div id="section_pelanggan_lama" class="form-group">
+                    <label>Cari Pelanggan *</label>
+                    <input type="text" list="list_pelanggan" class="form-control" placeholder="Ketik nama member..." id="input_cari_pelanggan" onchange="setPelangganID(this)">
+                    <datalist id="list_pelanggan">
                         <?php foreach ($pelanggan_list as $p): ?>
-                        <option value="<?php echo $p['id_pelanggan']; ?>"><?php echo htmlspecialchars($p['nama']); ?></option>
+                            <option data-id="<?php echo $p['id_pelanggan']; ?>" value="<?php echo htmlspecialchars($p['nama']); ?> (<?php echo htmlspecialchars($p['no_hp']); ?>)">
                         <?php endforeach; ?>
-                    </select>
+                    </datalist>
+                    <input type="hidden" name="id_pelanggan" id="id_pelanggan_hidden">
+                </div>
+
+                <div id="section_pelanggan_baru" style="display: none; border: 1px solid #E5E7EB; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>Nama Lengkap *</label>
+                        <input type="text" name="nama_baru" id="nama_baru" placeholder="Nama sesuai KTP">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>No KTP (NIK) *</label>
+                            <input type="text" name="ktp_baru" id="ktp_baru" maxlength="16" placeholder="16 digit angka">
+                        </div>
+                        <div class="form-group">
+                            <label>No HP *</label>
+                            <input type="text" name="hp_baru" id="hp_baru" placeholder="08xxxxxxxx">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email <small>(Opsional)</small></label>
+                        <input type="email" name="email_baru" id="email_baru" placeholder="contoh@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Alamat Lengkap *</label>
+                        <textarea name="alamat_baru" id="alamat_baru" rows="2" placeholder="Alamat domisili..."></textarea>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label>Kendaraan *</label>
                     <select name="id_kendaraan" id="id_kendaraan" required onchange="hitungTotal()">
-                        <option value="">Pilih Kendaraan</option>
+                        <option value="">-- Pilih Kendaraan Tersedia --</option>
                         <?php foreach ($kendaraan_tersedia as $k): ?>
                         <option value="<?php echo $k['id_kendaraan']; ?>" data-harga="<?php echo $k['harga_sewa'] ?? 300000; ?>">
                             <?php echo htmlspecialchars($k['merk']); ?> - <?php echo htmlspecialchars($k['no_plat']); ?>
@@ -160,7 +211,7 @@
                 <div class="sopir-toggle-container">
                     <label class="toggle-label" for="pakai_sopir">
                         <span class="toggle-text">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6B4226;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #6B4226;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                             Sewa dengan Sopir?
                         </span>
                         <label class="toggle-switch">
@@ -168,12 +219,11 @@
                             <span class="slider"></span>
                         </label>
                     </label>
-                    
                     <div id="div_sopir" style="display: none;">
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label for="id_sopir">Pilih Sopir *</label>
-                            <select name="id_sopir" id="id_sopir" onchange="hitungTotal()" style="background: white;">
-                                <option value="">Pilih Sopir Tersedia</option>
+                            <label>Pilih Sopir *</label>
+                            <select name="id_sopir" id="id_sopir" onchange="hitungTotal()">
+                                <option value="">Pilih Sopir</option>
                                 <?php foreach ($sopir_list as $s): ?>
                                 <option value="<?php echo $s['id_sopir']; ?>" data-tarif="<?php echo $s['tarif_harian']; ?>">
                                     <?php echo htmlspecialchars($s['nama']); ?> (Rp <?php echo number_format($s['tarif_harian'], 0, ',', '.'); ?>/hari)
@@ -187,11 +237,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tanggal Sewa *</label>
-                        <input type="text" class="datepicker" name="tgl_sewa" id="tgl_sewa" required placeholder="Pilih tanggal...">
+                        <input type="text" class="datepicker" name="tgl_sewa" id="tgl_sewa" required>
                     </div>
                     <div class="form-group">
                         <label>Tanggal Kembali *</label>
-                        <input type="text" class="datepicker" name="tgl_kembali" id="tgl_kembali" required placeholder="Pilih tanggal...">
+                        <input type="text" class="datepicker" name="tgl_kembali" id="tgl_kembali" required>
                     </div>
                 </div>
                 
@@ -306,6 +356,145 @@
                 document.getElementById('rincian_harga').innerText = '';
             }
         }
+
+        // Fungsi untuk mengubah tampilan form Pelanggan
+    function toggleModePelanggan(mode) {
+        const divLama = document.getElementById('section_pelanggan_lama');
+        const divBaru = document.getElementById('section_pelanggan_baru');
+        
+        // Inputan yang perlu di-required/un-required
+        const inputCari = document.getElementById('input_cari_pelanggan');
+        const inputNama = document.getElementById('nama_baru');
+        const inputKTP = document.getElementById('ktp_baru');
+        const inputHP = document.getElementById('hp_baru');
+        const inputAlamat = document.getElementById('alamat_baru');
+        
+        if (mode === 'baru') {
+            divLama.style.display = 'none';
+            divBaru.style.display = 'block';
+            
+            // Set required untuk field baru
+            inputCari.removeAttribute('required');
+            inputNama.setAttribute('required', 'required');
+            inputKTP.setAttribute('required', 'required');
+            inputHP.setAttribute('required', 'required');
+            inputAlamat.setAttribute('required', 'required');
+        } else {
+            divLama.style.display = 'block';
+            divBaru.style.display = 'none';
+            
+            // Set required untuk field lama
+            inputCari.setAttribute('required', 'required');
+            inputNama.removeAttribute('required');
+            inputKTP.removeAttribute('required');
+            inputHP.removeAttribute('required');
+            inputAlamat.removeAttribute('required');
+        }
+    }
+
+    // Fungsi Datalist ID (untuk mode pelanggan lama)
+    function setPelangganID(input) {
+        const list = document.getElementById('list_pelanggan');
+        const hiddenInput = document.getElementById('id_pelanggan_hidden');
+        let found = false;
+        
+        for (let i = 0; i < list.options.length; i++) {
+            if (list.options[i].value === input.value) {
+                hiddenInput.value = list.options[i].getAttribute('data-id');
+                found = true;
+                break;
+            }
+        }
+        if(!found) hiddenInput.value = '';
+    }
+
+    // Update fungsi openModal agar reset formnya benar
+    const originalOpenModal = openModal; // Simpan fungsi lama
+    openModal = function() {
+        // Panggil logika reset standar
+        document.getElementById('rentalForm').reset();
+        document.getElementById('div_sopir').style.display = 'none';
+        
+        // Reset ke mode "Pelanggan Lama" secara default
+        document.querySelector('input[name="mode_pelanggan"][value="lama"]').checked = true;
+        toggleModePelanggan('lama');
+        
+        modal.classList.add('active');
+    }
+
+    // Event Listener untuk Kolom KTP (Saat user selesai mengetik/pindah kolom)
+    document.getElementById('ktp_baru').addEventListener('change', function() {
+        const noKtp = this.value;
+        if (noKtp.length < 5) return; // Jangan cek jika terlalu pendek
+
+        // Tampilkan loading (opsional)
+        document.getElementById('nama_baru').placeholder = "Mengecek data...";
+
+        // Panggil Controller via Fetch API
+        fetch('index.php?page=pelanggan&action=api_check_pelanggan&no_ktp=' + noKtp)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'found') {
+                    // DATA DITEMUKAN! Isi otomatis formnya
+                    const p = result.data;
+                    
+                    document.getElementById('nama_baru').value = p.nama;
+                    if(p.no_ktp) document.getElementById('ktp_baru').value = p.no_ktp;
+                    if(p.no_hp) document.getElementById('hp_baru').value = p.no_hp; // Untuk listener KTP
+                    document.getElementById('alamat_baru').value = p.alamat;
+                    
+                    // TAMBAHAN: Isi email jika ada
+                    if(p.email) document.getElementById('email_baru').value = p.email;
+                    else document.getElementById('email_baru').value = ''; // Kosongkan jika tidak ada
+                    
+                    alert('Data pelanggan ditemukan! Formulir telah diisi otomatis.');
+
+                } else {
+                    // DATA TIDAK DITEMUKAN, Biarkan admin mengetik
+                    document.getElementById('nama_baru').placeholder = "Nama sesuai KTP";
+                    // Reset value jika admin mengganti nomor KTP dari yang ada ke yang tidak ada
+                    // document.getElementById('nama_baru').value = ''; 
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // Event Listener untuk Kolom HP (Auto-fill by Phone)
+    document.getElementById('hp_baru').addEventListener('change', function() {
+        const noHp = this.value;
+        if (noHp.length < 8) return; // Minimal panjang HP valid
+
+        // Tampilkan loading di placeholder
+        const inputNama = document.getElementById('nama_baru');
+        const originalPlaceholder = inputNama.placeholder;
+        inputNama.placeholder = "Mengecek no hp...";
+
+        // Panggil Controller via Fetch API dengan parameter no_hp
+        fetch('index.php?page=pelanggan&action=api_check_pelanggan&no_hp=' + noHp)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'found') {
+                    // DATA DITEMUKAN! Isi otomatis formnya
+                    const p = result.data;
+                    
+                    document.getElementById('nama_baru').value = p.nama;
+                    // Isi KTP juga jika ada datanya
+                    if(p.no_ktp) document.getElementById('ktp_baru').value = p.no_ktp; 
+                    document.getElementById('alamat_baru').value = p.alamat;
+                    if(p.email) document.getElementById('email_baru').value = p.email;
+                    
+                    alert('Data pelanggan ditemukan berdasarkan No HP! Data lain telah diisi otomatis.');
+                } else {
+                    // Jika tidak ditemukan, kembalikan placeholder
+                    inputNama.placeholder = "Nama sesuai KTP";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                inputNama.placeholder = "Nama sesuai KTP";
+            });
+    });
     </script>
 </body>
+
 </html>

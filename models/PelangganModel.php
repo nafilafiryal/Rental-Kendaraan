@@ -84,5 +84,32 @@ class PelangganModel {
         }
         return $stmt->fetchColumn() > 0;
     }
+
+    public function create($data) {
+        // Tambahkan "RETURNING id_pelanggan" agar kita dapat ID-nya setelah insert
+        $stmt = $this->db->prepare("
+            INSERT INTO pelanggan (nama, alamat, no_hp, no_ktp, email) 
+            VALUES (?, ?, ?, ?, ?)
+            RETURNING id_pelanggan
+        ");
+        
+        $stmt->execute([
+            $data['nama'], 
+            $data['alamat'], 
+            $data['no_hp'], 
+            $data['no_ktp'],
+            $data['email']
+        ]);
+        
+        // Kembalikan ID pelanggan yang baru dibuat
+        return $stmt->fetchColumn();
+    }
+
+    public function findByKtpOrHp($ktp, $hp) {
+        // Ubah SELECT id, nama menjadi SELECT * agar alamat & email terambil
+        $stmt = $this->db->prepare("SELECT * FROM pelanggan WHERE no_ktp = ? OR no_hp = ? LIMIT 1");
+        $stmt->execute([$ktp, $hp]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }
 ?>
